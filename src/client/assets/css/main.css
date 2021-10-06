@@ -1,0 +1,9 @@
+body {
+    font-family: 'Rubik', sans-serif;
+    background-image: url("../images/background.svg");
+    background-size: cover;
+}
+
+.dark body {
+    @apply bg-[#001220]
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
+import './assets/css/index.css'
+import '@purge-icons/generated'
 import App from './App'
 
 ReactDOM.render(

@@ -1,10 +1,8 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
-import Nav from './components/Nav'
-
 import Home from './views/Home'
-import About from './views/About'
+import Create from './views/Create'
 import NotFound from './views/NotFound'
 import Layout from "./layout/Layout";
 
@@ -16,8 +14,8 @@ const App = () => {
             <Route exact path="/">
                 <Home />
             </Route>
-            <Route path="/about">
-                <About />
+            <Route exact path="/app">
+                <Create />
             </Route>
             <Route>
                 <NotFound />
