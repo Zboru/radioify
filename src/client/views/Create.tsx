@@ -3,7 +3,7 @@ import Stepper from "../components/Stepper";
 import Step from "../components/Step";
 import Step1 from "../components/create/Step1";
 import Step2 from "../components/create/Step2";
-import Step3 from "../components/create/Step3";
+import Step3, {Song} from "../components/create/Step3";
 import dayjs from "dayjs";
 import Step4 from "../components/create/Step4";
 
@@ -21,6 +21,7 @@ export interface onDayChange extends Array<Date | object> {
 }
 
 const Create = () => {
+    const [songs, setSongs] = useState<Song[]>([]);
     const [currentStep, setStep] = useState(0);
     const [timeRange, setTimeRange] = useState<TimeRange>({
         startDate: dayjs().subtract(7,'days').toDate(),
@@ -82,12 +83,16 @@ const Create = () => {
                 onBackward={moveBackward}
             />
             <Step3
+                songs={songs}
+                setSongs={setSongs}
                 timeRange={timeRange}
                 active={currentStep === 2}
                 onForward={moveForward}
                 onBackward={moveBackward}
             />
             <Step4
+                setSongs={setSongs}
+                songs={songs}
                 active={currentStep === 3}
                 onForward={moveForward}
                 onBackward={moveBackward}

@@ -1,20 +1,22 @@
-import React, {MouseEventHandler, useEffect, useState} from "react";
+import React, {Dispatch, MouseEventHandler, useEffect, useState} from "react";
 import clsx from "clsx";
 import {TimeRange} from "../../views/Create";
 import dayjs from "dayjs";
 import {currentProgress, getSongsFromDateSpan} from "../../utils/radio";
 
-export interface Songs {
-    title: string
+export interface Song {
+    title: string,
+    excluded: boolean
 }
 
 const Step3 = (props: {
     timeRange: TimeRange,
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
-    active: boolean
+    active: boolean,
+    songs: Song[],
+    setSongs: Dispatch<Song[]>,
 }) => {
-    const [songs, setSongs] = useState<Songs[]>([]);
     const [searching, setSearching] = useState(false);
     const [searchProgress, setSearchProgress] = useState(0);
     useEffect(()=>{
@@ -40,7 +42,7 @@ const Step3 = (props: {
         const endDate = dayjs(props.timeRange.endDate);
         getSongsFromDateSpan(1, startDate, endDate, props.timeRange.startHour, props.timeRange.endHour)
             .then((songs) => {
-                setSongs(songs);
+                props.setSongs(songs);
                 setSearching(false);
             });
     }
@@ -57,10 +59,10 @@ const Step3 = (props: {
                 <span className="ml-2">Szukam... {searchProgress} / {getTotalDays()} dni</span>
             </p>
             }
-            {!searching && songs && !!songs.length &&
+            {!searching && props.songs && !!props.songs.length &&
             <p className="text-gray-500 italic flex items-center">
                 <span className="iconify" data-icon="mdi:check"/>
-                <span className="ml-2">Znalazłem ponad {songs.length} piosenek!</span>
+                <span className="ml-2">Znalazłem ponad {props.songs.length} piosenek!</span>
             </p>
             }
             <div className="flex">
@@ -73,7 +75,7 @@ const Step3 = (props: {
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
                 >Wstecz
                 </button>
-                <button disabled={!songs.length} onClick={props.onForward} type="button"
+                <button disabled={!props.songs.length} onClick={props.onForward} type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
                 >Dalej
                 </button>

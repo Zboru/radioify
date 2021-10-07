@@ -9,7 +9,7 @@ export interface StepProps {
 
 const Step = (props: StepProps) => {
     const stepClasses = [
-        "border-t-4 pt-4",
+        "border-t-4 pt-4 transition",
         {'border-green-600': props.active},
         {'border-gray-200': !props.active},
     ];

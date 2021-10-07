@@ -73,7 +73,7 @@ const Home = () => {
                 </div>
                 <div className="mt-4 w-3/4 dark:text-white text-xl font-regular">
                     Radioify pozwala ci w łatwy sposób utworzyć spersonalizowaną playlistę Spotify z piosenkami z
-                    Twojego radia internetowego. A to wszystko w kilku prostych krokach!
+                    Twojego radia internetowego. <br/>To wszystko w kilku prostych krokach!
                 </div>
             </div>
             {!spotifyProfileExists() &&

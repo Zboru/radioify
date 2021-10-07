@@ -1,6 +1,7 @@
 import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
 import {RadioListGroup, RadioListResponse} from "../../types";
+import TextField from "../TextField";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
@@ -37,6 +38,7 @@ const Step1 = (props: ({
                     )
                 })}
             </select>
+            <TextField placeholder={"Test"} label={"Test"} />
             <div className="flex">
                 <div className="flex-grow" />
                 <button onClick={props.onForward} type="button"

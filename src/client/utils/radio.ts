@@ -54,6 +54,6 @@ export async function getSongsFromDateSpan(radioID: number, startDate: Dayjs, en
     // Create unique array with all fetched songs
     const uniqueSongs = Array.from(new Set(songs));
     return uniqueSongs.map(song => {
-        return {title: song}
+        return {title: song, excluded: false}
     })
 }
