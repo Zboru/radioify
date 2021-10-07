@@ -40,8 +40,13 @@ app.get('/api/getProfile', async (req: express.Request, res: express.Response) =
     console.log("Getting profile")
     const accessToken = req.query.code
     spotifyApi.setAccessToken(accessToken);
-    const profileData = await spotifyApi.getMe();
-    res.send(profileData);
+    let profileData = {};
+    spotifyApi.getMe().then((r: any) => {
+        profileData = r.data;
+        res.send(profileData)
+    }).catch((err: any) => {
+        res.status(err.statusCode).send(err.body);
+    });
 });
 
 app.get('/*', (req: express.Request, res: express.Response) => {

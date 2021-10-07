@@ -2,8 +2,18 @@ body {
     font-family: 'Rubik', sans-serif;
     background-image: url("../images/background.svg");
     background-size: cover;
+    transition: all .25s ease-in-out;
 }
 
 .dark body {
-    @apply bg-[#001220]
+    background-color: #001220;
+    @apply text-white
+}
+
+.dark input, .dark select, .DayPickerInput {
+    color: #001220;
+}
+
+a, p {
+    transition: all .25s;
 }

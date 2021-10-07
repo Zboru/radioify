@@ -10,12 +10,12 @@ export interface StepProps {
 const Step = (props: StepProps) => {
     const stepClasses = [
         "border-t-4 pt-4",
-        {'border-purple-500': props.active},
+        {'border-green-600': props.active},
         {'border-gray-200': !props.active},
     ];
     const titleClasses = [
         "uppercase font-bold",
-        {'text-purple-500': props.active},
+        {'text-green-600': props.active},
         {'text-gray-400': !props.active},
     ]
     return (

@@ -69,17 +69,17 @@ app.post('/api/authorize', function (req, res) { return __awaiter(void 0, void 0
 app.get('/api/getProfile', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var accessToken, profileData;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                console.log("Getting profile");
-                accessToken = req.query.code;
-                spotifyApi.setAccessToken(accessToken);
-                return [4 /*yield*/, spotifyApi.getMe()];
-            case 1:
-                profileData = _a.sent();
-                res.send(profileData);
-                return [2 /*return*/];
-        }
+        console.log("Getting profile");
+        accessToken = req.query.code;
+        spotifyApi.setAccessToken(accessToken);
+        profileData = {};
+        spotifyApi.getMe().then(function (r) {
+            profileData = r.data;
+            res.send(profileData);
+        })["catch"](function (err) {
+            res.status(err.statusCode).send(err.body);
+        });
+        return [2 /*return*/];
     });
 }); });
 app.get('/*', function (req, res) {

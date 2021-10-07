@@ -8,11 +8,7 @@ import {SpotifyProfile, SpotifyProfileResponse} from "../types";
 const spotifyLoginURL = createAuthorizeURL()
 
 const Home = () => {
-    const [spotifyProfile, setProfile] = useState<SpotifyProfile>({
-        name: "",
-        image: "",
-        uri: ""
-    });
+    const [spotifyProfile, setProfile] = useState<SpotifyProfile | null>(null);
     let history = useHistory();
     const [spotifyTokens, setTokens] = useState(() => {
         const saved = localStorage.getItem("spotify");
@@ -39,11 +35,15 @@ const Home = () => {
                 code: spotifyTokens?.access_token
             }
         }).then(response => {
+            console.log(response)
+            console.debug(response.status)
             setProfile({
                 name: response.data.body.display_name,
                 image: response.data.body.images[0].url,
                 uri: response.data.body.uri
             })
+        }).catch(err => {
+            console.debug(err);
         })
     }
 
@@ -63,20 +63,20 @@ const Home = () => {
         }).then(response => {
             console.log(response.data)
         })
-    }, [spotifyTokens, spotifyProfile])
+    }, [])
     return (
-        <React.Fragment>
-            <main>
+        <div className="p-5">
+            <div>
                 <div
-                    className="mt-12 bg-gradient-to-bl from-green-400 via-green-300 to-blue-200 bg-clip-text text-transparent max-w-xl text-6xl font-medium">
+                    className="md:mt-12 bg-gradient-to-bl from-green-400 via-green-300 to-blue-200 bg-clip-text text-transparent max-w-xl text-4xl md:text-6xl font-medium">
                     Przenieś swoje ulubione radio do playlisty Spotify!
                 </div>
                 <div className="mt-4 w-3/4 dark:text-white text-xl font-regular">
-                    Radioify pozwala ci w sprawny sposób utworzyć spersonalizowaną playlistę Spotify z piosenkami z
+                    Radioify pozwala ci w łatwy sposób utworzyć spersonalizowaną playlistę Spotify z piosenkami z
                     Twojego radia internetowego. A to wszystko w kilku prostych krokach!
                 </div>
-            </main>
-            {spotifyProfileExists() &&
+            </div>
+            {!spotifyProfileExists() &&
             <a href={spotifyLoginURL}>
                 <button type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
@@ -85,10 +85,12 @@ const Home = () => {
                 </button>
             </a>
             }
+            {spotifyProfileExists() &&
             <div className={'flex items-center dark:text-white'}>
-                <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfile.image} alt=""/>
-                <span>Zalogowany jako {spotifyProfile.name}</span>
+                <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfile?.image} alt=""/>
+                <span>Zalogowany jako {spotifyProfile?.name}</span>
             </div>
+            }
             <Link to='/app'>
                 <button type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
@@ -96,7 +98,7 @@ const Home = () => {
                     Przejdź do aplikacji
                 </button>
             </Link>
-        </React.Fragment>
+        </div>
     );
 };
 
