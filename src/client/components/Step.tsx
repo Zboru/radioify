@@ -10,11 +10,11 @@ export interface StepProps {
 
 const Step = (props: StepProps) => {
     const stepClasses = [
-        "border-t-4 pt-4 transition sm:visible",
+        "border-t-4 pt-4 sm:transition",
         {'border-green-600': props.active},
         {'border-gray-200': !props.active},
         {'visible': props.mobileVisible},
-        {'hidden': !props.mobileVisible},
+        {'hidden sm:block': !props.mobileVisible},
     ];
     const titleClasses = [
         "uppercase font-bold",

@@ -56,12 +56,12 @@ const Step4 = (props: {
                 zostaną wykluczone z wyszukiwania oraz umieszczenia w playliście.</p>
             <div className="flex">
                 <div className="flex-grow" />
-                <TextField onChange={handleFilterChange} placeholder={"Szukaj utworu"}/>
+                <TextField onChange={handleFilterChange} placeholder={"Wyszukaj utwór"}/>
             </div>
-            <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md border-gray-300 h-56 w-100">
+            <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
                 {filteredSongs(songFilter).map((song: Song, index) => {
                     return (
-                        <div key={index} className="flex items-center bg-white pr-2 border-b border-gray-300 select-none">
+                        <div key={index} className="flex items-center dark:bg-gray-900 light:bg-white pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
                             <input onChange={(event) => {
                                 toggleSong(event, song)
                             }} checked={!song.excluded} id={`song-${index}`} type="checkbox" className="m-3"/>

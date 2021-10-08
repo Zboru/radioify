@@ -11,7 +11,7 @@ const TextField = (props: {
         <React.Fragment>
             <label className="flex flex-col text-gray-600 dark:text-gray-200" htmlFor={randomID}>
                 <span className="text-sm select-none">{props.label}</span>
-                <input onChange={props.onChange} placeholder={props.placeholder} id={randomID} className="border p-2 rounded" type="text"/>
+                <input onChange={props.onChange} placeholder={props.placeholder} id={randomID} className="border dark:border-gray-700 p-2 dark:bg-gray-900 dark:text-white rounded" type="text"/>
             </label>
         </React.Fragment>
     )

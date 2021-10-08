@@ -1,7 +1,6 @@
 import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
 import {RadioListGroup, RadioListResponse} from "../../types";
-import TextField from "../TextField";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,

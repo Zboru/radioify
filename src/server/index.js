@@ -51,11 +51,32 @@ app.use(express.json());
 var port = Number(process.env.PORT) || 4444;
 var distPath = path.resolve(__dirname + "../../../dist");
 app.use(express.static(distPath));
+app.get('/api/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var scopes, html;
+    return __generator(this, function (_a) {
+        scopes = [
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'playlist-read-private',
+            'playlist-read-collaborative',
+        ];
+        try {
+            html = spotifyApi.createAuthorizeURL(scopes);
+            res.send(html + "&show_dialog=true");
+        }
+        catch (e) {
+            console.error(e);
+        }
+        return [2 /*return*/];
+    });
+}); });
 app.post('/api/authorize', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var code;
     return __generator(this, function (_a) {
         code = req.body.code;
         spotifyApi.authorizationCodeGrant(code).then(function (data) {
+            spotifyApi.setAccessToken(data.body.access_token);
+            spotifyApi.setRefreshToken(data.body.refresh_token);
             res.send({
                 access_token: data.body.access_token,
                 refresh_token: data.body.refresh_token
@@ -67,19 +88,24 @@ app.post('/api/authorize', function (req, res) { return __awaiter(void 0, void 0
     });
 }); });
 app.get('/api/getProfile', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var accessToken, profileData;
+    var accessToken, data, profile;
     return __generator(this, function (_a) {
-        console.log("Getting profile");
-        accessToken = req.query.code;
-        spotifyApi.setAccessToken(accessToken);
-        profileData = {};
-        spotifyApi.getMe().then(function (r) {
-            profileData = r.data;
-            res.send(profileData);
-        })["catch"](function (err) {
-            res.status(err.statusCode).send(err.body);
-        });
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                console.log("====\tGetting profile");
+                accessToken = req.query.accessToken;
+                spotifyApi.setAccessToken(accessToken);
+                return [4 /*yield*/, spotifyApi.getMe()];
+            case 1:
+                data = _a.sent();
+                profile = {
+                    name: data.body.display_name,
+                    image: data.body.images[0].url,
+                    uri: data.body.uri
+                };
+                res.send(profile);
+                return [2 /*return*/];
+        }
     });
 }); });
 app.get('/*', function (req, res) {

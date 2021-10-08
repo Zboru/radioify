@@ -1,15 +1,12 @@
 import React, {useEffect, useState} from 'react'
 import {useHistory, useLocation} from "react-router-dom";
 import axios from "axios";
-import {createAuthorizeURL} from "../utils/spotify";
 import {Link} from "react-router-dom";
 import {SpotifyProfile, SpotifyProfileResponse} from "../types";
 
-const spotifyLoginURL = createAuthorizeURL()
-
 const Home = () => {
-    const [spotifyProfile, setProfile] = useState<SpotifyProfile | null>(null);
     let history = useHistory();
+    const [spotifyProfile, setProfile] = useState<SpotifyProfile | null>(null);
     const [spotifyTokens, setTokens] = useState(() => {
         const saved = localStorage.getItem("spotify");
         if (saved != null) {
@@ -29,44 +26,32 @@ const Home = () => {
             setTokens(response.data);
         })
     }
-    if (spotifyTokens && JSON.stringify(spotifyProfile) === "{}") {
-        axios.get<SpotifyProfileResponse>('/api/getProfile', {
-            params: {
-                code: spotifyTokens?.access_token
-            }
-        }).then(response => {
-            console.log(response)
-            console.debug(response.status)
-            setProfile({
-                name: response.data.body.display_name,
-                image: response.data.body.images[0].url,
-                uri: response.data.body.uri
-            })
-        }).catch(err => {
-            console.debug(err);
-        })
-    }
 
     function spotifyProfileExists() {
-        return spotifyProfile?.name !== "" ||
-            spotifyProfile.image !== "" ||
-            spotifyProfile.uri !== "";
+        return spotifyProfile !== null
     }
 
-    useEffect(()=>{
-        console.log(spotifyProfile)
-        console.log(spotifyTokens)
-        axios.get('/api/getProfile', {
-            params: {
-                code: spotifyTokens?.access_token
-            }
-        }).then(response => {
-            console.log(response.data)
+    function spotifyLogin() {
+        axios.get('/api/login').then(response => {
+            window.location = response.data;
         })
+    }
+
+    useEffect(() => {
+        if (spotifyTokens && spotifyProfile === null) {
+            axios.get<SpotifyProfile>('/api/getProfile', {
+                params: {
+                    accessToken: spotifyTokens?.access_token,
+                    refreshToken: spotifyTokens?.refresh_token
+                }
+            }).then(response => {
+                setProfile(response.data);
+            })
+        }
     }, [])
     return (
         <div className="p-5">
-            <div>
+            <div className="mb-2">
                 <div
                     className="md:mt-12 bg-gradient-to-bl from-green-400 via-green-300 to-blue-200 bg-clip-text text-transparent max-w-xl text-4xl md:text-6xl font-medium">
                     Przenieś swoje ulubione radio do playlisty Spotify!
@@ -77,13 +62,11 @@ const Home = () => {
                 </div>
             </div>
             {!spotifyProfileExists() &&
-            <a href={spotifyLoginURL}>
-                <button type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
-                    <span className={"iconify text-xl mr-2"} data-icon={'fa:spotify'}/>
-                    Zaloguj się przez Spotify
-                </button>
-            </a>
+            <button onClick={spotifyLogin} type="button"
+                    className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
+                <span className={"iconify text-xl mr-2"} data-icon={'fa:spotify'}/>
+                Zaloguj się przez Spotify
+            </button>
             }
             {spotifyProfileExists() &&
             <div className={'flex items-center dark:text-white'}>
@@ -91,13 +74,17 @@ const Home = () => {
                 <span>Zalogowany jako {spotifyProfile?.name}</span>
             </div>
             }
-            <Link to='/app'>
+            {spotifyProfileExists() && <span>
+                <Link to='/app'>
                 <button type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
                     <span className={"iconify text-xl mr-2"} data-icon={'fxemoji:saxophone'}/>
                     Przejdź do aplikacji
                 </button>
             </Link>
+            </span>
+            }
+
         </div>
     );
 };
