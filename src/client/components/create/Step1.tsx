@@ -27,7 +27,7 @@ const Step1 = (props: ({
         <div className={props.active ? 'visible' : 'hidden'}>
             <p>Skorzystaj z wyszukiwarki, aby wybrać radio, z którego mają być pobrane piosenki. Lista stacji radiowych jest dostarczana przez
                 serwis&nbsp;<a className="underline" href="https://odsluchane.eu" target="_blank">odSluchane.eu</a>.</p>
-            <select className='mt-2 border p-2 rounded'>
+            <select className='mt-2 border p-2 rounded w-full'>
                 {radioList && radioList.map(list => {
                     return (
                         <optgroup key={list.groupName} label={list.groupName}>
@@ -38,7 +38,6 @@ const Step1 = (props: ({
                     )
                 })}
             </select>
-            <TextField placeholder={"Test"} label={"Test"} />
             <div className="flex">
                 <div className="flex-grow" />
                 <button onClick={props.onForward} type="button"

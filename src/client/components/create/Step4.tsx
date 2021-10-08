@@ -1,7 +1,16 @@
-import React, {ChangeEvent, Dispatch, MouseEventHandler} from "react";
+import React, {
+    ChangeEvent,
+    ChangeEventHandler,
+    createRef,
+    Dispatch,
+    MouseEventHandler,
+    useEffect,
+    useState
+} from "react";
 import clsx from "clsx";
 import {Song} from "./Step3";
 import TextField from "../TextField";
+import Fuse from "fuse.js";
 
 const Step4 = (props: {
     onForward?: MouseEventHandler,
@@ -10,12 +19,35 @@ const Step4 = (props: {
     songs: Song[],
     setSongs: Dispatch<Song[]>,
 }) => {
+    const [songFilter, setSongFilter] = useState<string | null>(null)
+    const songListContainer = createRef<HTMLDivElement>();
+
+    function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {
+        const value = event.currentTarget.value
+        if (songListContainer.current) {
+            songListContainer.current.scrollTop = 0;
+        }
+        setSongFilter(value);
+    }
 
     function toggleSong(event: ChangeEvent<HTMLInputElement>, song: Song) {
         const songs = [...props.songs];
         const songIndex = songs.indexOf(song);
         songs[songIndex].excluded = !event.currentTarget.checked
         props.setSongs(songs)
+    }
+    const options = {
+        includeScore: true,
+        keys: ['title'],
+    }
+    const fuse = new Fuse(props.songs,options)
+
+    function filteredSongs(filter: string | null) {
+        if (filter) {
+            return fuse.search(filter).map(result => result.item);
+        } else {
+            return props.songs
+        }
     }
 
     return (
@@ -24,16 +56,16 @@ const Step4 = (props: {
                 zostaną wykluczone z wyszukiwania oraz umieszczenia w playliście.</p>
             <div className="flex">
                 <div className="flex-grow" />
-                <TextField placeholder={"Szukaj utworu"}/>
+                <TextField onChange={handleFilterChange} placeholder={"Szukaj utworu"}/>
             </div>
-            <div className="overflow-auto border rounded no-scrollbar shadow-md border-gray-300 h-56 w-100">
-                {props.songs && props.songs.map((song: Song, index) => {
+            <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md border-gray-300 h-56 w-100">
+                {filteredSongs(songFilter).map((song: Song, index) => {
                     return (
-                        <div key={index} className="border-b border-gray-300 select-none">
+                        <div key={index} className="flex items-center bg-white pr-2 border-b border-gray-300 select-none">
                             <input onChange={(event) => {
                                 toggleSong(event, song)
                             }} checked={!song.excluded} id={`song-${index}`} type="checkbox" className="m-3"/>
-                            <label htmlFor={`song-${index}`}>{song.title}</label>
+                            <label className="w-full py-2" htmlFor={`song-${index}`}>{song.title}</label>
                         </div>
                     )
                 })}

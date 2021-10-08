@@ -4,14 +4,17 @@ import clsx from "clsx";
 export interface StepProps {
     title: string,
     description: string
-    active?: boolean
+    active?: boolean,
+    mobileVisible?: boolean
 }
 
 const Step = (props: StepProps) => {
     const stepClasses = [
-        "border-t-4 pt-4 transition",
+        "border-t-4 pt-4 transition sm:visible",
         {'border-green-600': props.active},
         {'border-gray-200': !props.active},
+        {'visible': props.mobileVisible},
+        {'hidden': !props.mobileVisible},
     ];
     const titleClasses = [
         "uppercase font-bold",
