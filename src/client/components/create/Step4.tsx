@@ -20,9 +20,11 @@ const Step4 = (props: {
     onBackward?: MouseEventHandler,
     active: boolean,
     songs: Song[],
+    spotifySongs: {notFoundSongs: [], tracks: []},
     setSpotifySongs: Dispatch<any>,
     setSongs: Dispatch<Song[]>,
 }) => {
+    const [searching, setSearching] = useState(false);
     const [songFilter, setSongFilter] = useState<string | null>(null)
     const [spotifyTokens, setTokens] = useLocalStorage('spotify', null);
     const songListContainer = createRef<HTMLDivElement>();
@@ -55,9 +57,20 @@ const Step4 = (props: {
         }
     }
 
+    function searchDuration() {
+        return (props.songs?.length / 4.8).toFixed(2)
+    }
+
     function searchSongs() {
+        performance.mark('search')
+        setSearching(true)
         axios.post('http://localhost:4444/api/searchSongs', {tokens: spotifyTokens,songs: props.songs}).then(response => {
             props.setSpotifySongs(response.data);
+            setSearching(false)
+            performance.measure('searchMeasure', 'search');
+            console.log(performance.getEntriesByType("measure"));
+            performance.clearMarks();
+            performance.clearMeasures();
         })
     }
 
@@ -81,7 +94,19 @@ const Step4 = (props: {
                     )
                 })}
             </div>
-            <p className="mt-4">Czy chcesz kontynuować? Ta operacja może potrwać trochę dłużej.</p>
+            <p className="mt-4">Czy chcesz kontynuować? Ta operacja może potrwać ponad {searchDuration()} sekund.</p>
+            {searching &&
+            <p className="text-gray-500 italic flex items-center">
+                <span className="iconify animate-spin" data-icon="mdi:loading"/>
+                <span className="ml-2">Szukam...</span>
+            </p>
+            }
+            {(!searching && props.spotifySongs.tracks && props.spotifySongs.tracks.length) &&
+            <p className="text-gray-500 italic flex items-center">
+                <span className="iconify" data-icon="mdi:check"/>
+                <span className="ml-2">Znalazłem ponad {props.spotifySongs.tracks.length} piosenek!</span>
+            </p>
+            }
             <div className="flex">
                 <button onClick={searchSongs} type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"

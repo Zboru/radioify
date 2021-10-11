@@ -23,7 +23,7 @@ export interface onDayChange extends Array<Date | object> {
 
 const Create = () => {
     const [songs, setSongs] = useState<Song[]>([]);
-    const [spotifySongs, setSpotifySongs] = useState([]);
+    const [spotifySongs, setSpotifySongs] = useState({notFoundSongs: [], tracks: []});
     const [currentStep, setStep] = useState(0);
     const [timeRange, setTimeRange] = useState<TimeRange>({
         startDate: dayjs().subtract(7,'days').toDate(),
@@ -100,6 +100,7 @@ const Create = () => {
                 <Step4
                     setSongs={setSongs}
                     songs={songs}
+                    spotifySongs={spotifySongs}
                     setSpotifySongs={setSpotifySongs}
                     active={currentStep === 3}
                     onForward={moveForward}
