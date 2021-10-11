@@ -3,27 +3,44 @@ import {useHistory, useLocation} from "react-router-dom";
 import axios from "axios";
 import {Link} from "react-router-dom";
 import {SpotifyProfile, SpotifyProfileResponse} from "../types";
+import {useLocalStorage} from "../hooks/useLocalStorage";
+import clsx from "clsx";
 
 const Home = () => {
     let history = useHistory();
+    const [dataLoading, setLoading] = useState(false);
     const [spotifyProfile, setProfile] = useState<SpotifyProfile | null>(null);
-    const [spotifyTokens, setTokens] = useState(() => {
-        const saved = localStorage.getItem("spotify");
-        if (saved != null) {
-            return JSON.parse(saved);
-        }
-        return {}
-    });
-    if (JSON.stringify(spotifyTokens) !== "{}") {
-        console.log("Saving tokens")
-        localStorage.setItem('spotify', JSON.stringify(spotifyTokens));
-    }
+    const [spotifyTokens, setTokens] = useLocalStorage('spotify', null)
+
     const location = useLocation<Location>();
-    const authCode = location?.search.replaceAll("?code=", "");
+    const authCode = location?.search.replaceAll(/(\?code=)|(&state.+)/g, "");
     if (authCode) {
-        axios.post('/api/authorize', {code: authCode}).then((response) => {
+        axios.post(import.meta.env.VITE_API_URL+"/api/authorize", {code: authCode}).then((response) => {
             history.push('/')
             setTokens(response.data);
+        })
+    }
+
+    useEffect(() => {
+        setLoading(true)
+        if (spotifyTokens && spotifyProfile === null) {
+            axios.get<SpotifyProfile>(import.meta.env.VITE_API_URL+"/api/getProfile", {
+                params: {
+                    accessToken: spotifyTokens?.access_token,
+                    refreshToken: spotifyTokens?.refresh_token
+                }
+            }).then(response => {
+                setProfile(response.data);
+                setTimeout(() => {
+                    setLoading(false)
+                }, 1000)
+            })
+        }
+    }, [])
+
+    function spotifyLogin() {
+        axios.get(import.meta.env.VITE_API_URL + '/api/login').then(response => {
+            window.location = response.data;
         })
     }
 
@@ -31,24 +48,6 @@ const Home = () => {
         return spotifyProfile !== null
     }
 
-    function spotifyLogin() {
-        axios.get('/api/login').then(response => {
-            window.location = response.data;
-        })
-    }
-
-    useEffect(() => {
-        if (spotifyTokens && spotifyProfile === null) {
-            axios.get<SpotifyProfile>('/api/getProfile', {
-                params: {
-                    accessToken: spotifyTokens?.access_token,
-                    refreshToken: spotifyTokens?.refresh_token
-                }
-            }).then(response => {
-                setProfile(response.data);
-            })
-        }
-    }, [])
     return (
         <div className="p-5">
             <div className="mb-2">
@@ -61,6 +60,12 @@ const Home = () => {
                     Twojego radia internetowego. <br/>To wszystko w kilku prostych krokach!
                 </div>
             </div>
+            {dataLoading &&
+            <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full mr-2 animate-pulse bg-gray-200"/>
+                <div className="h-5 w-64 bg-gray-200 ml-2 animate-pulse rounded-lg"/>
+            </div>
+            }
             {!spotifyProfileExists() &&
             <button onClick={spotifyLogin} type="button"
                     className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
@@ -69,7 +74,10 @@ const Home = () => {
             </button>
             }
             {spotifyProfileExists() &&
-            <div className={'flex items-center dark:text-white'}>
+            <div className={clsx('flex items-center dark:text-white',{
+                'hidden': dataLoading,
+                'visible': !dataLoading
+            })}>
                 <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfile?.image} alt=""/>
                 <span>Zalogowany jako {spotifyProfile?.name}</span>
             </div>
@@ -84,7 +92,6 @@ const Home = () => {
             </Link>
             </span>
             }
-
         </div>
     );
 };
