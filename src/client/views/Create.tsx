@@ -6,6 +6,7 @@ import Step2 from "../components/create/Step2";
 import Step3, {Song} from "../components/create/Step3";
 import dayjs from "dayjs";
 import Step4 from "../components/create/Step4";
+import Step5 from "../components/create/Step5";
 
 export interface TimeRange {
     startDate: Date,
@@ -22,6 +23,7 @@ export interface onDayChange extends Array<Date | object> {
 
 const Create = () => {
     const [songs, setSongs] = useState<Song[]>([]);
+    const [spotifySongs, setSpotifySongs] = useState([]);
     const [currentStep, setStep] = useState(0);
     const [timeRange, setTimeRange] = useState<TimeRange>({
         startDate: dayjs().subtract(7,'days').toDate(),
@@ -98,9 +100,17 @@ const Create = () => {
                 <Step4
                     setSongs={setSongs}
                     songs={songs}
+                    setSpotifySongs={setSpotifySongs}
                     active={currentStep === 3}
                     onForward={moveForward}
                     onBackward={moveBackward}
+                />
+                <Step5
+                    spotifySongs={spotifySongs}
+                    active={currentStep === 4}
+                    onForward={moveForward}
+                    onBackward={moveBackward}
+                    songList={songs}
                 />
             </div>
         </div>
