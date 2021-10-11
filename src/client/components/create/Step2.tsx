@@ -48,7 +48,7 @@ const Step2 = (props: {
                         onDayChange={props.onEndDateChange}
                         dayPickerProps={{weekdaysShort: WEEKDAYS_SHORT, months: MONTHS}}
                         value={props.endDate}
-                        inputProps={{readOnly: 'true', className: 'border p-2 h-10 rounded leading-normal'}}
+                        inputProps={{readOnly: true, className: 'border p-2 h-10 rounded leading-normal'}}
                         placeholder={"YYYY-MM-DD"}
                     />
                 </label>

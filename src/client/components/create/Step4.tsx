@@ -11,15 +11,20 @@ import clsx from "clsx";
 import {Song} from "./Step3";
 import TextField from "../TextField";
 import Fuse from "fuse.js";
+import axios from "axios";
+import {useLocalStorage} from "../../hooks/useLocalStorage";
+import {SpotifyTrack} from "../../types";
 
 const Step4 = (props: {
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
     active: boolean,
     songs: Song[],
+    setSpotifySongs: Dispatch<any>,
     setSongs: Dispatch<Song[]>,
 }) => {
     const [songFilter, setSongFilter] = useState<string | null>(null)
+    const [spotifyTokens, setTokens] = useLocalStorage('spotify', null);
     const songListContainer = createRef<HTMLDivElement>();
 
     function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {
@@ -50,6 +55,12 @@ const Step4 = (props: {
         }
     }
 
+    function searchSongs() {
+        axios.post('http://localhost:4444/api/searchSongs', {tokens: spotifyTokens,songs: props.songs}).then(response => {
+            props.setSpotifySongs(response.data);
+        })
+    }
+
     return (
         <div className={clsx(props.active ? 'visible' : 'hidden')}>
             <p>Sprawdź pobraną listę i zaznacz utwory, które mają zostać wyszukane w serwisie Spotify. Utwory odznaczone
@@ -61,7 +72,7 @@ const Step4 = (props: {
             <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
                 {filteredSongs(songFilter).map((song: Song, index) => {
                     return (
-                        <div key={index} className="flex items-center dark:bg-gray-900 light:bg-white pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
+                        <div key={index} className="flex items-center dark:bg-gray-900 bg-white pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
                             <input onChange={(event) => {
                                 toggleSong(event, song)
                             }} checked={!song.excluded} id={`song-${index}`} type="checkbox" className="m-3"/>
@@ -72,7 +83,7 @@ const Step4 = (props: {
             </div>
             <p className="mt-4">Czy chcesz kontynuować? Ta operacja może potrwać trochę dłużej.</p>
             <div className="flex">
-                <button onClick={props.onBackward} type="button"
+                <button onClick={searchSongs} type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
                 >Szukaj
                 </button>

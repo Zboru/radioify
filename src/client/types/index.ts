@@ -19,9 +19,13 @@ export interface SpotifyProfileResponse {
 }
 
 export interface SpotifyProfile {
-    name: string,
+    name?: string,
     image: string,
     uri: string
+}
+
+export interface SpotifyTrack {
+    name: string,
 }
 
 
