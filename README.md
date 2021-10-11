@@ -1,6 +1,8 @@
 # Radioify
 
-Radioify is my side-project that allows you to create a Spotify playlist consisting songs that were aired on Polish radios, using the [odSluchane.eu](http://google.com) service. This is a project that serves as a start for me to learn React and Typescript in practice, so don't expect perfect code and solutions.
+Radioify is my side-project that allows you to create a Spotify playlist consisting songs that were aired on Polish radios, using the [odSluchane.eu](http://google.com) service. It started out as a CLI application, but who normal is going to download an entire repository and click on a terminal? That is why a web version was created. 
+
+This is a project that serves as a start for me to learn React and Typescript in practice, so don't expect perfect code and solutions.
 
 ## Tech used
 |Tech|Description|
