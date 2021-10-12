@@ -1,12 +1,14 @@
 import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
-import {RadioListGroup, RadioListResponse} from "../../types";
+import {RadioListResponse, StationResponse} from "../../types";
+import RAutocomplete from "../RAutocomplete";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
-    active: boolean
+    active: boolean,
+    selectRadio: any,
 })) => {
-    const [radioList, setRadiolist] = useState<RadioListGroup[] | null>(() => {
+    const [radioList, setRadiolist] = useState<StationResponse[] | null>(() => {
         const savedList = sessionStorage.getItem("radioList");
         if (savedList != null) {
             return JSON.parse(savedList);
@@ -16,8 +18,9 @@ const Step1 = (props: ({
     useEffect(() => {
         if (!radioList?.length) {
             axios.get<RadioListResponse>("//ods.lynx.re/radiolst.php").then((response) => {
-                sessionStorage.setItem('radioList', JSON.stringify(response.data.summary))
-                setRadiolist(response.data.summary)
+                const radioList = response.data.summary.flatMap(group => group.stations)
+                sessionStorage.setItem('radioList', JSON.stringify(radioList))
+                setRadiolist(radioList)
             })
         }
     }, [])
@@ -26,17 +29,14 @@ const Step1 = (props: ({
         <div className={props.active ? 'visible' : 'hidden'}>
             <p>Skorzystaj z wyszukiwarki, aby wybrać radio, z którego mają być pobrane piosenki. Lista stacji radiowych jest dostarczana przez
                 serwis&nbsp;<a className="underline" href="https://odsluchane.eu" target="_blank">odSluchane.eu</a>.</p>
-            <select className='mt-2 border p-2 rounded w-full'>
-                {radioList && radioList.map(list => {
-                    return (
-                        <optgroup key={list.groupName} label={list.groupName}>
-                            {list.stations && list.stations.map(station => {
-                                return (<option key={station.id} value={station.id}>{station.name}</option>)
-                            })}
-                        </optgroup>
-                    )
-                })}
-            </select>
+            <RAutocomplete
+                searchBy="name"
+                display="name"
+                items={radioList}
+                label={'Wyszukaj radio'}
+                onSelect={props.selectRadio}
+                placeholder={'Antyradio'}
+            />
             <div className="flex">
                 <div className="flex-grow" />
                 <button onClick={props.onForward} type="button"
