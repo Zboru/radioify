@@ -1,15 +1,25 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import clsx from "clsx";
+import {useLocalStorage} from "../../hooks/useLocalStorage";
 
 const switchContainerClasses = ["w-14 h-7 flex transition items-center rounded-full mx-3 px-1"]
 const switchBallClasses = ["bg-white w-5 h-5 rounded-full transition shadow-md transform"];
 
 const DarkModeSwitch = () => {
+    const [darkMode, setMode] = useLocalStorage('darkMode', false);
 
     const toggleMode = () => {
         setChecked(!checked);
+        setMode(!darkMode)
         document.querySelector('html')?.classList.toggle('dark');
     }
+
+    useEffect(()=>{
+        if (darkMode) {
+            setChecked(!checked);
+            document.querySelector('html')?.classList.add('dark');
+        }
+    }, [])
 
     const [checked, setChecked] = useState(false);
     return (
