@@ -5,6 +5,9 @@ import DPI from 'react-day-picker/DayPickerInput';
 // @ts-ignore
 const DayPickerInput = DPI.__esModule ? DPI.default : DPI
 import 'react-day-picker/lib/style.css';
+import RButton from "../RButton";
+import {createSliderWithTooltip, Range as RangeDefault} from "rc-slider";
+import 'rc-slider/assets/index.css';
 
 const Step2 = (props: {
     onStartDateChange?: any,
@@ -19,6 +22,7 @@ const Step2 = (props: {
     onBackward?: MouseEventHandler,
     active: boolean
 }) => {
+    const Range = createSliderWithTooltip(RangeDefault);
     return (
         <div className={clsx(props.active ? 'visible' : 'hidden', 'font-regular')}>
             <p>Ustal przedział czasowy, z którego aplikacja ma wyszukać piosenki. Godziny określają porę dnia, w której
@@ -58,16 +62,11 @@ const Step2 = (props: {
                            className="border h-10 p-2.5 rounded w-3/5" max={24} min={0}/>
                 </label>
             </div>
+            <Range min={0} marks={{0:'0',24:'24'}} defaultValue={[props.startHour, props.endHour]} max={24}/>
             <div className="flex">
                 <div className="flex-grow"/>
-                <button onClick={props.onBackward} type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
-                >Wstecz
-                </button>
-                <button onClick={props.onForward} type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
-                >Dalej
-                </button>
+                <RButton className="mr-2" onClick={props.onBackward}>Wstecz</RButton>
+                <RButton onClick={props.onForward}>Dalej</RButton>
             </div>
         </div>
     )
