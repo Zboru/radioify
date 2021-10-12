@@ -1,13 +1,14 @@
 import React, {ChangeEvent, createRef, MouseEventHandler, useState} from "react";
 import clsx from "clsx";
-import {Song} from "./Step3";
 import Fuse from "fuse.js";
+import {spotifySongs} from "./Step4";
+
 
 const Step5 = (props: {
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
     active: boolean,
-    spotifySongs: any,
+    spotifySongs: spotifySongs | null,
     songList: any
 }) => {
     const [songFilter, setSongFilter] = useState<string | null>(null)
@@ -20,28 +21,34 @@ const Step5 = (props: {
         }
         setSongFilter(value);
     }
-    const options = {
-        includeScore: true,
-        keys: ['title'],
-    }
-    const fuse = new Fuse(props.spotifySongs.tracks,options)
 
     function filteredSongs(filter: string | null) {
-        if (filter) {
-            return fuse.search(filter).map(result => result.item);
-        } else {
-            return props.spotifySongs.notFoundSongs
+        if (props.spotifySongs !== null) {
+            const options = {
+                includeScore: true,
+                keys: ['title'],
+            }
+            const fuse = new Fuse(props.spotifySongs.notFoundSongs, options)
+            if (filter) {
+                return fuse.search(filter).map(result => result.item);
+            } else {
+                return props.spotifySongs?.notFoundSongs
+            }
         }
     }
+
     return (
         <div className={clsx(props.active ? 'visible' : 'hidden')}>
-            <p className="mb-2">Znaleziono ponad {props.spotifySongs.tracks?.length} piosenek na Spotify z {props.songList.length} granych w radiu.
+            <p className="mb-2">Znaleziono ponad {props.spotifySongs?.tracks?.length} piosenek na Spotify
+                z {props.songList.length} granych w radiu.
                 Poniżej jest lista piosenek, których nie udało się wyszukać:</p>
-            <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
-                {filteredSongs(songFilter)?.map((song: Song, index: React.Key | null | undefined) => {
+            <div ref={songListContainer}
+                 className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
+                {filteredSongs(songFilter)?.map((track, index) => {
                     return (
-                        <div key={index} className="flex items-center dark:bg-gray-900 light:bg-white pl-4 pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
-                            <label className="w-full py-2" htmlFor={`song-${index}`}>{song.title}</label>
+                        <div key={index}
+                             className="flex items-center dark:bg-gray-900 light:bg-white pl-4 pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
+                            <label className="w-full py-2" htmlFor={`song-${index}`}>{track.title}</label>
                         </div>
                     )
                 })}

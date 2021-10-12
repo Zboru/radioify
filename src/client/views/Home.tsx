@@ -2,9 +2,10 @@ import React, {useEffect, useState} from 'react'
 import {useHistory, useLocation} from "react-router-dom";
 import axios from "axios";
 import {Link} from "react-router-dom";
-import {SpotifyProfile, SpotifyProfileResponse} from "../types";
+import {SpotifyProfile} from "../types";
 import {useLocalStorage} from "../hooks/useLocalStorage";
 import clsx from "clsx";
+import RButton from "../components/RButton";
 
 const Home = () => {
     let history = useHistory();
@@ -15,16 +16,16 @@ const Home = () => {
     const location = useLocation<Location>();
     const authCode = location?.search.replaceAll(/(\?code=)|(&state.+)/g, "");
     if (authCode) {
-        axios.post(import.meta.env.VITE_API_URL+"/api/authorize", {code: authCode}).then((response) => {
+        axios.post(import.meta.env.VITE_API_URL + "/api/authorize", {code: authCode}).then((response) => {
             history.push('/')
             setTokens(response.data);
         })
     }
 
     useEffect(() => {
-        setLoading(true)
         if (spotifyTokens && spotifyProfile === null) {
-            axios.get<SpotifyProfile>(import.meta.env.VITE_API_URL+"/api/getProfile", {
+            setLoading(true)
+            axios.get<SpotifyProfile>(import.meta.env.VITE_API_URL + "/api/getProfile", {
                 params: {
                     accessToken: spotifyTokens?.access_token,
                     refreshToken: spotifyTokens?.refresh_token
@@ -66,7 +67,7 @@ const Home = () => {
                 <div className="h-5 w-64 bg-gray-200 ml-2 animate-pulse rounded-lg"/>
             </div>
             }
-            {!spotifyProfileExists() &&
+            {(!spotifyProfileExists() && !dataLoading) &&
             <button onClick={spotifyLogin} type="button"
                     className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
                 <span className={"iconify text-xl mr-2"} data-icon={'fa:spotify'}/>
@@ -74,7 +75,7 @@ const Home = () => {
             </button>
             }
             {spotifyProfileExists() &&
-            <div className={clsx('flex items-center dark:text-white',{
+            <div className={clsx('flex items-center dark:text-white', {
                 'hidden': dataLoading,
                 'visible': !dataLoading
             })}>
@@ -82,15 +83,12 @@ const Home = () => {
                 <span>Zalogowany jako {spotifyProfile?.name}</span>
             </div>
             }
-            {spotifyProfileExists() && <span>
+            {spotifyProfileExists() &&
+            <p className="inline-block">
                 <Link to='/app'>
-                <button type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
-                    <span className={"iconify text-xl mr-2"} data-icon={'fxemoji:saxophone'}/>
-                    Przejdź do aplikacji
-                </button>
-            </Link>
-            </span>
+                    <RButton className="mt-4" icon={'fxemoji:saxophone'}>Przejdź do aplikacji</RButton>
+                </Link>
+            </p>
             }
         </div>
     );

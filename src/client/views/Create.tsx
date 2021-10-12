@@ -5,8 +5,9 @@ import Step1 from "../components/create/Step1";
 import Step2 from "../components/create/Step2";
 import Step3, {Song} from "../components/create/Step3";
 import dayjs from "dayjs";
-import Step4 from "../components/create/Step4";
+import Step4, {spotifySongs} from "../components/create/Step4";
 import Step5 from "../components/create/Step5";
+import {StationResponse} from "../types";
 
 export interface TimeRange {
     startDate: Date,
@@ -22,11 +23,12 @@ export interface onDayChange extends Array<Date | object> {
 }
 
 const Create = () => {
+    const [selectedRadio, selectRadio] = useState<StationResponse | null>(null);
     const [songs, setSongs] = useState<Song[]>([]);
-    const [spotifySongs, setSpotifySongs] = useState({notFoundSongs: [], tracks: []});
+    const [spotifySongs, setSpotifySongs] = useState<spotifySongs | null>(null);
     const [currentStep, setStep] = useState(0);
     const [timeRange, setTimeRange] = useState<TimeRange>({
-        startDate: dayjs().subtract(7,'days').toDate(),
+        startDate: dayjs().subtract(7, 'days').toDate(),
         startHour: 10,
         endDate: new Date(),
         endHour: 15,
@@ -42,6 +44,10 @@ const Create = () => {
         if (currentStep > 0) {
             setStep(currentStep - 1);
         }
+    }
+
+    function handleSelectRadio(radio: any) {
+        selectRadio(radio);
     }
 
     function setStartDate(...args: onDayChange) {
@@ -68,14 +74,24 @@ const Create = () => {
     return (
         <div>
             <Stepper className={'my-4 px-4 sm:p-0'}>
-                <Step title={"Krok 1"} mobileVisible={StepMobileVisible(0)} active={currentStep === 0} description={"Wybierz radio"}/>
-                <Step title={"Krok 2"} mobileVisible={StepMobileVisible(1)} active={currentStep === 1} description={"Określ czas"}/>
-                <Step title={"Krok 3"} mobileVisible={StepMobileVisible(2)} active={currentStep === 2} description={"Pobierz piosenki"}/>
-                <Step title={"Krok 4"} mobileVisible={StepMobileVisible(3)} active={currentStep === 3} description={"Znajdź w Spotify"}/>
-                <Step title={"Krok 5"} mobileVisible={StepMobileVisible(4)} active={currentStep === 4} description={"Stwórz playlistę"}/>
+                <Step title={"Krok 1"} mobileVisible={StepMobileVisible(0)} active={currentStep === 0}
+                      description={"Wybierz radio"}/>
+                <Step title={"Krok 2"} mobileVisible={StepMobileVisible(1)} active={currentStep === 1}
+                      description={"Określ czas"}/>
+                <Step title={"Krok 3"} mobileVisible={StepMobileVisible(2)} active={currentStep === 2}
+                      description={"Pobierz piosenki"}/>
+                <Step title={"Krok 4"} mobileVisible={StepMobileVisible(3)} active={currentStep === 3}
+                      description={"Znajdź w Spotify"}/>
+                <Step title={"Krok 5"} mobileVisible={StepMobileVisible(4)} active={currentStep === 4}
+                      description={"Stwórz playlistę"}/>
             </Stepper>
             <div className={"p-4 sm:p-0"}>
-                <Step1 active={currentStep === 0} onForward={moveForward}/>
+                <Step1
+                    selectedRadio={selectedRadio}
+                    selectRadio={handleSelectRadio}
+                    active={currentStep === 0}
+                    onForward={moveForward}
+                />
                 <Step2
                     onStartDateChange={setStartDate}
                     onStartHourChange={setStartHour}
@@ -90,6 +106,7 @@ const Create = () => {
                     onBackward={moveBackward}
                 />
                 <Step3
+                    selectedRadio={selectedRadio}
                     songs={songs}
                     setSongs={setSongs}
                     timeRange={timeRange}

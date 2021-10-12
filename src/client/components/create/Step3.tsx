@@ -3,6 +3,8 @@ import clsx from "clsx";
 import {TimeRange} from "../../views/Create";
 import dayjs from "dayjs";
 import {currentProgress, getSongsFromDateSpan} from "../../utils/radio";
+import {StationResponse} from "../../types";
+import RButton from "../RButton";
 
 export interface Song {
     title: string,
@@ -14,6 +16,7 @@ const Step3 = (props: {
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
     active: boolean,
+    selectedRadio: StationResponse | null,
     songs: Song[],
     setSongs: Dispatch<Song[]>,
 }) => {
@@ -40,7 +43,8 @@ const Step3 = (props: {
         setSearching(true);
         const startDate = dayjs(props.timeRange.startDate);
         const endDate = dayjs(props.timeRange.endDate);
-        getSongsFromDateSpan(1, startDate, endDate, props.timeRange.startHour, props.timeRange.endHour)
+        const radioID = props.selectedRadio?.id ?? 1;
+        getSongsFromDateSpan(radioID, startDate, endDate, props.timeRange.startHour, props.timeRange.endHour)
             .then((songs) => {
                 props.setSongs(songs);
                 setSearching(false);
@@ -66,19 +70,10 @@ const Step3 = (props: {
             </p>
             }
             <div className="flex">
-                <button onClick={startSearch} type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
-                >Szukaj
-                </button>
+                <RButton onClick={startSearch}>Szukaj</RButton>
                 <div className="flex-grow" />
-                <button onClick={props.onBackward} type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
-                >Wstecz
-                </button>
-                <button disabled={!props.songs.length} onClick={props.onForward} type="button"
-                        className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
-                >Dalej
-                </button>
+                <RButton className="mr-2" onClick={props.onBackward}>Wstecz</RButton>
+                <RButton disabled={!props.songs.length} onClick={props.onForward}>Dalej</RButton>
             </div>
         </div>
     )
