@@ -1,12 +1,12 @@
 import React, {FormEvent, useState} from "react"
-import Stepper from "../components/Stepper";
-import Step from "../components/Step";
-import Step1 from "../components/create/Step1";
-import Step2 from "../components/create/Step2";
-import Step3, {Song} from "../components/create/Step3";
+import Stepper from "../components/create/Stepper";
+import Step from "../components/create/Step";
+import Step1 from "../components/create/steps/Step1";
+import Step2 from "../components/create/steps/Step2";
+import Step3, {Song} from "../components/create/steps/Step3";
 import dayjs from "dayjs";
-import Step4, {spotifySongs} from "../components/create/Step4";
-import Step5 from "../components/create/Step5";
+import Step4, {spotifySongs} from "../components/create/steps/Step4";
+import Step5 from "../components/create/steps/Step5";
 import {StationResponse} from "../types";
 
 export interface TimeRange {
@@ -58,17 +58,12 @@ const Create = () => {
         setTimeRange({...timeRange, endDate: args[0]})
     }
 
-    function setStartHour(event: FormEvent<HTMLInputElement>) {
-        setTimeRange({...timeRange, startHour: parseInt(event.currentTarget.value)})
-    }
-
-    function setEndHour(event: FormEvent<HTMLInputElement>) {
-        console.log(event.currentTarget.value)
-        setTimeRange({...timeRange, endHour: parseInt(event.currentTarget.value)})
-    }
-
     function StepMobileVisible(index: number) {
         return Math.abs(currentStep - index) < 2;
+    }
+
+    function setHours(hours: number[]) {
+        setTimeRange({...timeRange, startHour: hours[0], endHour: hours[1]})
     }
 
     return (
@@ -85,7 +80,7 @@ const Create = () => {
                 <Step title={"Krok 5"} mobileVisible={StepMobileVisible(4)} active={currentStep === 4}
                       description={"Stwórz playlistę"}/>
             </Stepper>
-            <div className={"p-4 sm:p-0"}>
+            <div>
                 <Step1
                     selectedRadio={selectedRadio}
                     selectRadio={handleSelectRadio}
@@ -94,9 +89,8 @@ const Create = () => {
                 />
                 <Step2
                     onStartDateChange={setStartDate}
-                    onStartHourChange={setStartHour}
                     onEndDateChange={setEndDate}
-                    onEndHourChange={setEndHour}
+                    onHoursChange={setHours}
                     startDate={timeRange.startDate}
                     endDate={timeRange.endDate}
                     startHour={timeRange.startHour}

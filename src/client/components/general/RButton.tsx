@@ -8,7 +8,7 @@ const RButton = (props: {
     icon?: string,
     onClick?: MouseEventHandler<HTMLButtonElement>,
 }) => {
-    const buttonClasses = ['rounded-lg transition bg-white dark:text-gray-200 text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700']
+    const buttonClasses = ['rounded-lg border transition bg-white dark:text-gray-200 text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700']
     return (
         <button
             type="button"

@@ -1,10 +1,11 @@
 import React, {Dispatch, MouseEventHandler, useEffect, useState} from "react";
 import clsx from "clsx";
-import {TimeRange} from "../../views/Create";
+import {TimeRange} from "../../../views/Create";
 import dayjs from "dayjs";
-import {currentProgress, getSongsFromDateSpan} from "../../utils/radio";
-import {StationResponse} from "../../types";
-import RButton from "../RButton";
+import {currentProgress, getSongsFromDateSpan} from "../../../utils/radio";
+import {StationResponse} from "../../../types";
+import RButton from "../../general/RButton";
+import Card from "../Card";
 
 export interface Song {
     title: string,
@@ -52,7 +53,7 @@ const Step3 = (props: {
     }
 
     return (
-        <div className={clsx(props.active ? 'visible' : 'hidden', 'font-regular')}>
+        <Card active={props.active}>
             <p>Aplikacja wyszuka teraz wszystkie piosenki, które były grane w danym okresie. Wybrano
                 łącznie {getTotalDays()} dni, czyli dokładnie {getTotalHours()} godzin licząc z ustalonego przedziału.
             </p>
@@ -69,13 +70,13 @@ const Step3 = (props: {
                 <span className="ml-2">Znalazłem ponad {props.songs.length} piosenek!</span>
             </p>
             }
-            <div className="flex">
+            <div className="flex mt-2">
                 <RButton onClick={startSearch}>Szukaj</RButton>
                 <div className="flex-grow" />
                 <RButton className="mr-2" onClick={props.onBackward}>Wstecz</RButton>
                 <RButton disabled={!props.songs.length} onClick={props.onForward}>Dalej</RButton>
             </div>
-        </div>
+        </Card>
     )
 }
 export default Step3

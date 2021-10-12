@@ -107,7 +107,7 @@ const RAutocomplete = ({label, placeholder, items, display, searchBy, onSelect}:
                        onChange={handleTextFieldEvent}
                        label={label} placeholder={placeholder}/>
             {(listState && items) &&
-            <div className="max-h-64 no-scrollbar overflow-y-scroll w-full shadow rounded w-full">
+            <div className="absolute max-h-64 no-scrollbar overflow-y-scroll w-full shadow rounded w-full">
                 {filteredItems()?.map((item, index) => {
                     return <div onMouseEnter={()=>{setPosition(index)}} onMouseDown={(ev)=>{ev.preventDefault();selectItem(item)}} className={clsx("border select-none dark:border-gray-700 p-2 dark:bg-gray-900 dark:text-white bg-white p-2",{'bg-gray-300 dark:bg-gray-700 active-list-item': listPosition === index})} key={index}>{item[display || 'text']}</div>
                 })}

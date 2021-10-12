@@ -1,7 +1,7 @@
-import React, {ChangeEvent, createRef, MouseEventHandler, useState} from "react";
-import clsx from "clsx";
+import React, {createRef, MouseEventHandler, useState} from "react";
 import Fuse from "fuse.js";
 import {spotifySongs} from "./Step4";
+import Card from "../Card";
 
 
 const Step5 = (props: {
@@ -13,14 +13,6 @@ const Step5 = (props: {
 }) => {
     const [songFilter, setSongFilter] = useState<string | null>(null)
     const songListContainer = createRef<HTMLDivElement>();
-
-    function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {
-        const value = event.currentTarget.value
-        if (songListContainer.current) {
-            songListContainer.current.scrollTop = 0;
-        }
-        setSongFilter(value);
-    }
 
     function filteredSongs(filter: string | null) {
         if (props.spotifySongs !== null) {
@@ -38,7 +30,7 @@ const Step5 = (props: {
     }
 
     return (
-        <div className={clsx(props.active ? 'visible' : 'hidden')}>
+        <Card active={props.active}>
             <p className="mb-2">Znaleziono ponad {props.spotifySongs?.tracks?.length} piosenek na Spotify
                 z {props.songList.length} granych w radiu.
                 Poniżej jest lista piosenek, których nie udało się wyszukać:</p>
@@ -65,7 +57,7 @@ const Step5 = (props: {
                 >Dalej
                 </button>
             </div>
-        </div>
+        </Card>
     )
 }
 export default Step5;

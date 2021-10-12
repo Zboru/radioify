@@ -2,6 +2,7 @@ body {
     font-family: 'Rubik', sans-serif;
     background-image: url("../images/background.svg");
     background-size: cover;
+    background-color: #f9f9f9;
     background-attachment: fixed;
     transition: all .25s ease-in-out;
 }

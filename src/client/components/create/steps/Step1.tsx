@@ -1,8 +1,10 @@
 import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
-import {RadioListResponse, StationResponse} from "../../types";
-import RAutocomplete from "../RAutocomplete";
-import RButton from "../RButton";
+import {RadioListResponse, StationResponse} from "../../../types";
+import RAutocomplete from "../../general/RAutocomplete";
+import RButton from "../../general/RButton";
+import clsx from "clsx";
+import Card from "../Card";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
@@ -28,7 +30,7 @@ const Step1 = (props: ({
     }, [])
 
     return (
-        <div className={props.active ? 'visible' : 'hidden'}>
+        <Card active={props.active}>
             <p>Skorzystaj z wyszukiwarki, aby wybrać radio, z którego mają być pobrane piosenki. Lista stacji radiowych jest dostarczana przez
                 serwis&nbsp;<a className="underline" href="https://odsluchane.eu" target="_blank">odSluchane.eu</a>.</p>
             <RAutocomplete
@@ -43,7 +45,7 @@ const Step1 = (props: ({
                 <div className="flex-grow" />
                 <RButton disabled={!props.selectedRadio} className="mt-2" onClick={props.onForward}>Dalej</RButton>
             </div>
-        </div>
+        </Card>
     )
 }
 export default Step1

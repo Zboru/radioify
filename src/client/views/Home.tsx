@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {SpotifyProfile} from "../types";
 import {useLocalStorage} from "../hooks/useLocalStorage";
 import clsx from "clsx";
-import RButton from "../components/RButton";
+import RButton from "../components/general/RButton";
 
 const Home = () => {
     let history = useHistory();

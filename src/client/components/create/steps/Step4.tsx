@@ -9,12 +9,13 @@ import React, {
 } from "react";
 import clsx from "clsx";
 import {Song} from "./Step3";
-import TextField from "../TextField";
+import TextField from "../../general/TextField";
 import Fuse from "fuse.js";
 import axios from "axios";
-import {useLocalStorage} from "../../hooks/useLocalStorage";
-import {SpotifyTrack} from "../../types";
-import RButton from "../RButton";
+import {useLocalStorage} from "../../../hooks/useLocalStorage";
+import {SpotifyTrack} from "../../../types";
+import RButton from "../../general/RButton";
+import Card from "../Card";
 
 export interface notFoundSong {
     title: string,
@@ -73,20 +74,16 @@ const Step4 = (props: {
     }
 
     function searchSongs() {
-        performance.mark('search')
         setSearching(true)
-        axios.post('http://localhost:4444/api/searchSongs', {tokens: spotifyTokens,songs: props.songs}).then(response => {
+        const notExcludedSongs = props.songs.filter(song => !song.excluded)
+        axios.post('http://localhost:4444/api/searchSongs', {tokens: spotifyTokens,songs: notExcludedSongs}).then(response => {
             props.setSpotifySongs(response.data);
             setSearching(false)
-            performance.measure('searchMeasure', 'search');
-            console.log(performance.getEntriesByType("measure"));
-            performance.clearMarks();
-            performance.clearMeasures();
         })
     }
 
     return (
-        <div className={clsx(props.active ? 'visible' : 'hidden')}>
+        <Card active={props.active}>
             <p>Sprawdź pobraną listę i zaznacz utwory, które mają zostać wyszukane w serwisie Spotify. Utwory odznaczone
                 zostaną wykluczone z wyszukiwania oraz umieszczenia w playliście.</p>
             <div className="flex">
@@ -118,13 +115,13 @@ const Step4 = (props: {
                 <span className="ml-2">Znalazłem ponad {props.spotifySongs.tracks.length} piosenek!</span>
             </p>
             }
-            <div className="flex">
+            <div className="flex mt-2">
                 <RButton onClick={searchSongs}>Szukaj</RButton>
                 <div className="flex-grow"/>
                 <RButton className="mr-2" onClick={props.onBackward}>Wstecz</RButton>
                 <RButton disabled={!props.spotifySongs?.tracks.length} onClick={props.onForward}>Dalej</RButton>
             </div>
-        </div>
+        </Card>
     )
 }
 export default Step4
