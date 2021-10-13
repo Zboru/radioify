@@ -3,8 +3,8 @@ import axios from "axios";
 import {RadioListResponse, StationResponse} from "../../../types";
 import RAutocomplete from "../../general/RAutocomplete";
 import RButton from "../../general/RButton";
-import clsx from "clsx";
 import Card from "../Card";
+import {useLocalStorage} from "../../../hooks/useLocalStorage";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
@@ -12,18 +12,12 @@ const Step1 = (props: ({
     selectRadio: any,
     selectedRadio: any,
 })) => {
-    const [radioList, setRadiolist] = useState<StationResponse[] | null>(() => {
-        const savedList = sessionStorage.getItem("radioList");
-        if (savedList != null) {
-            return JSON.parse(savedList);
-        }
-        return null
-    });
+    const [radioList, setRadiolist] = useLocalStorage('radioList', [])
+
     useEffect(() => {
         if (!radioList?.length) {
             axios.get<RadioListResponse>("//ods.lynx.re/radiolst.php").then((response) => {
                 const radioList = response.data.summary.flatMap(group => group.stations)
-                sessionStorage.setItem('radioList', JSON.stringify(radioList))
                 setRadiolist(radioList)
             })
         }
