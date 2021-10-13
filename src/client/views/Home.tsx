@@ -9,20 +9,12 @@ import RButton from "../components/general/RButton";
 
 const Home = () => {
     let history = useHistory();
+    const location = useLocation<Location>();
     const [dataLoading, setLoading] = useState(false);
-    const [spotifyProfile, setProfile] = useState<SpotifyProfile | null>(null);
+    const [spotifyProfile, setProfile] = useLocalStorage('spoitfyProfile',null);
     const [spotifyTokens, setTokens] = useLocalStorage('spotify', null)
 
-    const location = useLocation<Location>();
-    const authCode = location?.search.replaceAll(/(\?code=)|(&state.+)/g, "");
-    if (authCode) {
-        axios.post(import.meta.env.VITE_API_URL + "/api/authorize", {code: authCode}).then((response) => {
-            history.push('/')
-            setTokens(response.data);
-        })
-    }
-
-    useEffect(() => {
+    function loadProfile() {
         if (spotifyTokens && spotifyProfile === null) {
             setLoading(true)
             axios.get<SpotifyProfile>(import.meta.env.VITE_API_URL + "/api/getProfile", {
@@ -37,7 +29,21 @@ const Home = () => {
                 }, 1000)
             })
         }
-    }, [])
+    }
+
+    useEffect(()=>{
+        const authCode = location?.search.replaceAll(/(\?code=)|(&state.+)/g, "");
+        if (authCode) {
+            axios.post(import.meta.env.VITE_API_URL + "/api/authorize", {code: authCode}).then((response) => {
+                setTokens(response.data);
+                history.push('/')
+            })
+        }
+    },[])
+
+    useEffect(() => {
+        loadProfile();
+    }, [spotifyTokens])
 
     function spotifyLogin() {
         axios.get(import.meta.env.VITE_API_URL + '/api/login').then(response => {
