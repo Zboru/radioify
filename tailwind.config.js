@@ -9,7 +9,11 @@ module.exports = {
         md: '850px'
       }
     },
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'height': 'height'
+      }
+    },
   },
   variants: {},
   plugins: []
