@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 
 const SpotifyWebApi = require('spotify-web-api-node');
 import {AuthorizationCodeResponse, RefreshTokenResponse, SpotifyTrack} from "./types";
-import {SpotifyProfile} from "../client/types";
+import {SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
 
 const express = require('express');
 const router = express.Router();
@@ -30,6 +30,7 @@ router.get('/api/login', async (req: Request, res: Response) => {
 
 router.post('/api/authorize', async (req: Request, res: Response) => {
     const code = req.body.code;
+    console.log(code)
     spotifyApi.authorizationCodeGrant(code).then((data: AuthorizationCodeResponse) => {
         spotifyApi.setAccessToken(data.body.access_token);
         spotifyApi.setRefreshToken(data.body.refresh_token);
@@ -101,6 +102,49 @@ router.post('/api/searchSongs', async (req: Request, res: Response) => {
         }
     }
     res.send({tracks, notFoundSongs});
+});
+
+router.get('/api/getPlaylists', async (req: Request, res: Response) => {
+    console.log("====\tGetting profile")
+    const {refreshToken} = req.query
+    await refreshAccessToken(refreshToken)
+    spotifyApi.getUserPlaylists({'limit': 50}).then((response: any) => {
+        res.send(response);
+    }).catch((err: any) => {
+        console.log(err)
+    })
+});
+
+router.post('/api/addNewPlaylist', async (req: Request, res: Response) => {
+    console.log("====\tAdding new playlist")
+    const {refreshToken, name} = req.body
+    await refreshAccessToken(refreshToken);
+    spotifyApi.createPlaylist(name).then((response: any) => {
+        res.send(response)
+    })
+});
+
+router.post('/api/addToPlaylist', async (req: Request, res: Response) => {
+    console.log("====\tAdding to playlist")
+    const {refreshToken, playlist, songs} = req.body
+    await refreshAccessToken(refreshToken)
+    let tracksURIs = songs.map((track: SpotifyPlaylistItem) => {
+        return {uri: track.uri}
+    })
+    try {
+        const data = await spotifyApi.removeTracksFromPlaylist(playlist.id, tracksURIs, {snapshot_id: playlist.snapshot_id})
+        console.log(data);
+    } catch (er) {
+        console.log(er)
+    }
+    tracksURIs = songs.map((track: SpotifyPlaylistItem) => {
+        return track.uri
+    })
+    spotifyApi.addTracksToPlaylist(playlist.id, tracksURIs).then((resp: any) => {
+        res.send(resp)
+    }).catch((e: any) => {
+        console.log(e)
+    })
 });
 
 export default router

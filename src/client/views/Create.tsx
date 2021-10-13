@@ -59,7 +59,7 @@ const Create = () => {
     }
 
     function StepMobileVisible(index: number) {
-        return Math.abs(currentStep - index) < 2;
+        return Math.abs(currentStep - index) < 2 || index == 2;
     }
 
     function setHours(hours: number[]) {
@@ -67,7 +67,7 @@ const Create = () => {
     }
 
     return (
-        <div>
+        <div className="flex flex-col h-full">
             <Stepper className={'my-4 px-4 sm:p-0'}>
                 <Step title={"Krok 1"} mobileVisible={StepMobileVisible(0)} active={currentStep === 0}
                       description={"Wybierz radio"}/>
@@ -80,7 +80,7 @@ const Create = () => {
                 <Step title={"Krok 5"} mobileVisible={StepMobileVisible(4)} active={currentStep === 4}
                       description={"Stwórz playlistę"}/>
             </Stepper>
-            <div>
+            <div className="flex flex-grow">
                 <Step1
                     selectedRadio={selectedRadio}
                     selectRadio={handleSelectRadio}

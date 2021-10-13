@@ -22,7 +22,7 @@ const RAutocomplete = ({label, placeholder, items, display, searchBy, onSelect}:
     let [search, setSearch] = useState("");
     let [listPosition, setPosition] = useState(0);
     let [listState, toggleList] = useState(false);
-    
+
     function handleTextFieldEvent(event: ChangeEvent<HTMLInputElement>) {
         setSearch(event.currentTarget.value)
         setPosition(0);

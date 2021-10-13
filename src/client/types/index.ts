@@ -28,6 +28,20 @@ export interface SpotifyTrack {
     name: string,
 }
 
+export interface SpotifyPlaylistItem {
+    name: string,
+    uri: string,
+    snapshot_id: string,
+    owner: {
+        uri: string
+    }
+}
+
+export interface SpotifyPlaylistResponse {
+    body: {
+        items: SpotifyPlaylistItem[]
+    }
+}
 
 // API Radiolist types
 export interface StationResponse {
