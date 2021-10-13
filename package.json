@@ -6,7 +6,6 @@
   "scripts": {
     "server": "tsc-watch ./src/server/index.ts --onSuccess \"node ./src/server/index.js\"",
     "start": "ts-node src/server/index.ts",
-    "postinstall": "vite build",
     "dev": "vite --host",
     "watch": "vite build --watch",
     "build": "tsc && vite build",

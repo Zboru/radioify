@@ -4,8 +4,4 @@ import PurgeIcons from 'vite-plugin-purge-icons'
 
 export default defineConfig({
     plugins: [reactRefresh(), PurgeIcons()],
-    mode: "development",
-    build: {
-        minify: 'terser',
-    }
 })
