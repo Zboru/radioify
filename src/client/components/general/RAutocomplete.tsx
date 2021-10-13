@@ -22,7 +22,7 @@ const RAutocomplete = ({label, placeholder, items, display, searchBy, onSelect}:
     let [search, setSearch] = useState("");
     let [listPosition, setPosition] = useState(0);
     let [listState, toggleList] = useState(false);
-
+    
     function handleTextFieldEvent(event: ChangeEvent<HTMLInputElement>) {
         setSearch(event.currentTarget.value)
         setPosition(0);
@@ -55,6 +55,9 @@ const RAutocomplete = ({label, placeholder, items, display, searchBy, onSelect}:
         const KEY_UP = "ArrowUp";
         const BACKSPACE = "Backspace";
         const ENTER = "Enter";
+
+        toggleList(true)
+
         if (event.key === KEY_DOWN || event.key === KEY_UP || event.key === ENTER) {
             event.preventDefault();
             event.stopPropagation();
