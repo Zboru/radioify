@@ -111,8 +111,6 @@ router.get('/api/getPlaylists', async (req: Request, res: Response) => {
     await refreshAccessToken(refreshToken)
     spotifyApi.getUserPlaylists({'limit': 50}).then((response: any) => {
         res.send(response);
-    }).catch((err: any) => {
-        console.log(err)
     })
 });
 
