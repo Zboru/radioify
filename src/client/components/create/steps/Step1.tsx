@@ -1,6 +1,5 @@
 import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
-import {RadioListResponse, StationResponse} from "../../../types";
 import RAutocomplete from "../../general/RAutocomplete";
 import RButton from "../../general/RButton";
 import Card from "../Card";
@@ -16,9 +15,8 @@ const Step1 = (props: ({
 
     useEffect(() => {
         if (!radioList?.length) {
-            axios.get<RadioListResponse>("//ods.lynx.re/radiolst.php").then((response) => {
-                const radioList = response.data.summary.flatMap(group => group.stations)
-                setRadiolist(radioList)
+            axios.get(import.meta.env.VITE_API_URL + '/api/radiolist').then(response => {
+                setRadiolist(response.data);
             })
         }
     }, [])

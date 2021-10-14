@@ -55,11 +55,12 @@ const Step4 = (props: {
         songs[songIndex].excluded = !event.currentTarget.checked
         props.setSongs(songs)
     }
+
     const options = {
         includeScore: true,
         keys: ['title'],
     }
-    const fuse = new Fuse(props.songs,options)
+    const fuse = new Fuse(props.songs, options)
 
     function filteredSongs(filter: string | null) {
         if (filter) {
@@ -76,7 +77,10 @@ const Step4 = (props: {
     function searchSongs() {
         setSearching(true)
         const notExcludedSongs = props.songs.filter(song => !song.excluded)
-        axios.post('http://localhost:4444/api/searchSongs', {tokens: spotifyTokens,songs: notExcludedSongs}).then(response => {
+        axios.post(import.meta.env.VITE_API_URL + '/api/searchSongs', {
+            tokens: spotifyTokens,
+            songs: notExcludedSongs
+        }).then(response => {
             props.setSpotifySongs(response.data);
             setSearching(false)
         })
@@ -87,13 +91,15 @@ const Step4 = (props: {
             <p>Sprawdź pobraną listę i zaznacz utwory, które mają zostać wyszukane w serwisie Spotify. Utwory odznaczone
                 zostaną wykluczone z wyszukiwania oraz umieszczenia w playliście.</p>
             <div className="flex">
-                <div className="flex-grow" />
+                <div className="flex-grow"/>
                 <TextField onChange={handleFilterChange} placeholder={"Wyszukaj utwór"}/>
             </div>
-            <div ref={songListContainer} className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
+            <div ref={songListContainer}
+                 className="overflow-auto border rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 h-56 w-100">
                 {filteredSongs(songFilter).map((song: Song, index) => {
                     return (
-                        <div key={index} className="flex items-center dark:bg-gray-900 bg-white pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
+                        <div key={index}
+                             className="flex items-center dark:bg-gray-900 bg-white pr-2 border-b dark:border-gray-700 light:border-gray-300 select-none">
                             <input onChange={(event) => {
                                 toggleSong(event, song)
                             }} checked={!song.excluded} id={`song-${index}`} type="checkbox" className="m-3"/>

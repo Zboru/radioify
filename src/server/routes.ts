@@ -1,8 +1,8 @@
 import {Request, Response} from "express";
-
 const SpotifyWebApi = require('spotify-web-api-node');
-import {AuthorizationCodeResponse, RefreshTokenResponse, SpotifyTrack} from "./types";
-import {SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
+import {AuthorizationCodeResponse, SpotifyTrack} from "./types";
+import {RadioListResponse, SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
+import axios from "axios";
 
 function chunk(arr: any[], size: number) {
     return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
@@ -17,6 +17,14 @@ const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     redirectUri: process.env.SPOTIFY_REDIRECT_URL
+});
+
+router.get('/api/radiolist', async (req: Request, res: Response) => {
+    const RADIOLIST_URL = "https://ods.lynx.re/radiolst.php";
+    axios.get<RadioListResponse>(RADIOLIST_URL).then((response) => {
+        const radioList = response.data.summary.flatMap(group => group.stations)
+        res.send(radioList);
+    })
 });
 
 router.get('/api/login', async (req: Request, res: Response) => {
