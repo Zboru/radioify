@@ -41,9 +41,10 @@ export async function getSongsFromDay(radioID: number, currentDate: Dayjs, start
 }
 
 // Get song list from day span
-export async function getSongsFromDateSpan(radioID: number, startDate: Dayjs, endDate: Dayjs, startHour: number, endHour: number) {
+export async function getSongsFromDateSpan(radioID: number, sD: string, eD: string, startHour: number, endHour: number) {
     currentProgress = 0;
-
+    const endDate = dayjs(eD);
+    const startDate = dayjs(sD);
     const totalDays: number = Math.abs(endDate.diff(startDate, 'days'));
 
     const promises = [];

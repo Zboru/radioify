@@ -1,8 +1,11 @@
 import {Request, Response} from "express";
+
 const SpotifyWebApi = require('spotify-web-api-node');
 import {AuthorizationCodeResponse, SpotifyTrack} from "./types";
 import {RadioListResponse, SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
 import axios from "axios";
+import {getSongsFromDateSpan} from "../client/utils/radio";
+import dayjs = require("dayjs");
 
 function chunk(arr: any[], size: number) {
     return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
@@ -25,6 +28,12 @@ router.get('/api/radiolist', async (req: Request, res: Response) => {
         const radioList = response.data.summary.flatMap(group => group.stations)
         res.send(radioList);
     })
+});
+
+router.get('/api/getRadioTracks', async (req: Request, res: Response) => {
+    const {radioID, startDate, endDate, startHour, endHour} = req.params
+    const data = await getSongsFromDateSpan(parseInt(radioID), startDate, endDate, parseInt(startHour), parseInt(endHour));
+    res.send(data);
 });
 
 router.get('/api/login', async (req: Request, res: Response) => {

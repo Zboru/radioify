@@ -6,6 +6,7 @@ import {currentProgress, getSongsFromDateSpan} from "../../../utils/radio";
 import {StationResponse} from "../../../types";
 import RButton from "../../general/RButton";
 import Card from "../Card";
+import axios from "axios";
 
 export interface Song {
     title: string,
@@ -23,8 +24,8 @@ const Step3 = (props: {
 }) => {
     const [searching, setSearching] = useState(false);
     const [searchProgress, setSearchProgress] = useState(0);
-    useEffect(()=>{
-        setInterval(()=>{
+    useEffect(() => {
+        setInterval(() => {
             setSearchProgress(currentProgress)
         }, 200);
     }, []);
@@ -45,11 +46,18 @@ const Step3 = (props: {
         const startDate = dayjs(props.timeRange.startDate);
         const endDate = dayjs(props.timeRange.endDate);
         const radioID = props.selectedRadio?.id ?? 1;
-        getSongsFromDateSpan(radioID, startDate, endDate, props.timeRange.startHour, props.timeRange.endHour)
-            .then((songs) => {
-                props.setSongs(songs);
-                setSearching(false);
-            });
+        axios.get(import.meta.env.VITE_API_URL + "/api/getRadioTracks", {
+            params: {
+                radioID: radioID,
+                startDate: startDate,
+                endDate: endDate,
+                startHour: props.timeRange.startHour,
+                endHour: props.timeRange.endHour
+            }
+        }).then(response => {
+            props.setSongs(response.data);
+            setSearching(false);
+        })
     }
 
     return (
@@ -72,7 +80,7 @@ const Step3 = (props: {
             }
             <div className="flex mt-2">
                 <RButton onClick={startSearch}>Szukaj</RButton>
-                <div className="flex-grow" />
+                <div className="flex-grow"/>
                 <RButton className="mr-2" onClick={props.onBackward}>Wstecz</RButton>
                 <RButton disabled={!props.songs.length} onClick={props.onForward}>Dalej</RButton>
             </div>
