@@ -26,6 +26,7 @@ export interface SpotifyProfile {
 
 export interface SpotifyTrack {
     name: string,
+    uri: string,
 }
 
 export interface SpotifyPlaylistItem {

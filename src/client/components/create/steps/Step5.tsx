@@ -7,6 +7,7 @@ import {useLocalStorage} from "../../../hooks/useLocalStorage";
 import RButton from "../../general/RButton";
 import {SpotifyPlaylistItem, SpotifyPlaylistResponse} from "../../../types";
 import TextField from "../../general/TextField";
+import {Song} from "./Step3";
 
 const Step5 = (props: {
     onForward?: MouseEventHandler,
@@ -26,7 +27,7 @@ const Step5 = (props: {
         return props.spotifySongs?.notFoundSongs || []
     }
 
-    function handlePlaylist() {
+    function handlePlaylist(e: React.MouseEvent) {
         axios.post(import.meta.env.VITE_API_URL + "/api/addToPlaylist", {
             refreshToken: spotifyTokens.refresh_token,
             playlist: selectedPlaylist,
@@ -34,6 +35,9 @@ const Step5 = (props: {
                 return {uri: track.uri}
             })
         }).then(response => {
+            if (props.onForward) {
+                props.onForward(e)
+            }
             console.log(response)
         })
     }
@@ -64,6 +68,10 @@ const Step5 = (props: {
         })
     }
 
+    function notExcludedSongs() {
+        return props.songList.filter((song: Song) => !song.excluded).length
+    }
+
     useEffect(() => {
         getUserPlaylists();
     }, [])
@@ -71,7 +79,7 @@ const Step5 = (props: {
     return (
         <Card active={props.active}>
             <p className="mb-2">Znaleziono ponad {props.spotifySongs?.tracks?.length} piosenek na Spotify
-                z {props.songList.length} granych w radiu.
+                z {notExcludedSongs()} granych w radiu.
                 Poniżej jest lista piosenek, których nie udało się wyszukać:</p>
             <div ref={songListContainer}
                  className={clsx(listState ? 'h-56 border' : 'h-0', 'overflow-auto transition-height rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 w-100')}>
@@ -83,6 +91,12 @@ const Step5 = (props: {
                         </div>
                     )
                 })}
+                {!notFoundSongs().length &&
+                <div className="flex justify-center flex-col items-center h-full">
+                    <span className="iconify text-4xl" data-icon="fluent:missing-metadata-16-regular" />
+                    <span>Lista jest pusta</span>
+                </div>
+                }
             </div>
             <RButton onClick={() => {
                 toggleList(!listState)

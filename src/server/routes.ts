@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 const SpotifyWebApi = require('spotify-web-api-node');
 import {AuthorizationCodeResponse, RefreshTokenResponse, SpotifyTrack} from "./types";
 import {SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
+import {chunk} from "../client/utils/utils";
 
 const express = require('express');
 const router = express.Router();
@@ -125,26 +126,30 @@ router.post('/api/addNewPlaylist', async (req: Request, res: Response) => {
 });
 
 router.post('/api/addToPlaylist', async (req: Request, res: Response) => {
-    console.log("====\tAdding to playlist")
     const {refreshToken, playlist, songs} = req.body
     await refreshAccessToken(refreshToken)
-    let tracksURIs = songs.map((track: SpotifyPlaylistItem) => {
+
+    // Delete all duplicates from playlist
+    const removeTracksURIs = chunk(songs.map((track: SpotifyPlaylistItem) => {
         return {uri: track.uri}
-    })
-    try {
-        const data = await spotifyApi.removeTracksFromPlaylist(playlist.id, tracksURIs, {snapshot_id: playlist.snapshot_id})
-        console.log(data);
-    } catch (er) {
-        console.log(er)
+    }), 100)
+    const removePromises = [];
+    for (let index in removeTracksURIs) {
+        removePromises.push(spotifyApi.removeTracksFromPlaylist(playlist.id, removeTracksURIs[index], {snapshot_id: playlist.snapshot_id}))
     }
-    tracksURIs = songs.map((track: SpotifyPlaylistItem) => {
+    await Promise.allSettled(removePromises)
+
+    // Add new tracks to playlist
+    const newTracksURIs = chunk(songs.map((track: SpotifyPlaylistItem) => {
         return track.uri
-    })
-    spotifyApi.addTracksToPlaylist(playlist.id, tracksURIs).then((resp: any) => {
-        res.send(resp)
-    }).catch((e: any) => {
-        console.log(e)
-    })
+    }), 100)
+    const newTrackPromises = [];
+    for (let index in newTracksURIs) {
+        newTrackPromises.push(spotifyApi.addTracksToPlaylist(playlist.id, newTracksURIs[index]));
+    }
+    await Promise.allSettled(newTrackPromises)
+
+    res.send({message: 'ok'}).status(201)
 });
 
 export default router

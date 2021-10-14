@@ -12,7 +12,7 @@ const Card = ({children, active, className}: IProps) => {
         <div
             className={clsx(
                 className,
-                'shadow p-4 bg-white dark:bg-gray-800 rounded',
+                'shadow p-4 bg-white w-full dark:bg-gray-800 rounded',
                 active ? 'visible' : 'hidden',
             )}
         >{children}</div>

@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import Step4, {spotifySongs} from "../components/create/steps/Step4";
 import Step5 from "../components/create/steps/Step5";
 import {StationResponse} from "../types";
+import Step6 from "../components/create/steps/Step6";
 
 export interface TimeRange {
     startDate: Date,
@@ -35,7 +36,7 @@ const Create = () => {
     });
 
     function moveForward() {
-        if (currentStep < 4) {
+        if (currentStep < 5) {
             setStep(currentStep + 1);
         }
     }
@@ -123,6 +124,9 @@ const Create = () => {
                     onForward={moveForward}
                     onBackward={moveBackward}
                     songList={songs}
+                />
+                <Step6
+                    active={currentStep === 5}
                 />
             </div>
         </div>
