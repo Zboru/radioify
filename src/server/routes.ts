@@ -16,7 +16,7 @@ const router = express.Router();
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: "http://localhost:3000/"
+    redirectUri: process.env.SPOTIFY_REDIRECT_URL
 });
 
 router.get('/api/login', async (req: Request, res: Response) => {

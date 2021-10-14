@@ -1,10 +1,12 @@
 import {Request, RequestHandler, Response} from "express";
 const path = require('path')
 const cors = require('cors');
+const morgan = require('morgan');
 const express = require('express');
 require('dotenv').config()
 const app = express();
 
+app.use(morgan());
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
