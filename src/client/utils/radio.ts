@@ -1,9 +1,19 @@
-import {chunk, range} from "./utils";
 import dayjs, {Dayjs} from "dayjs";
 import axios from "axios";
 import {PlaylistResponse} from "../types";
 
 const PLAYLIST_URL = "https://ods.lynx.re/playlist.php";
+
+function range(start: number, end: number) {
+    return (new Array(end - start + 1)).fill(undefined).map((_, i) => i + start);
+}
+
+
+function chunk(arr: any[], size: number) {
+    return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
+        arr.slice(i * size, i * size + size)
+    )
+}
 
 export let currentProgress = 0;
 

@@ -3,7 +3,12 @@ import {Request, Response} from "express";
 const SpotifyWebApi = require('spotify-web-api-node');
 import {AuthorizationCodeResponse, RefreshTokenResponse, SpotifyTrack} from "./types";
 import {SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
-import {chunk} from "../client/utils/utils";
+
+function chunk(arr: any[], size: number) {
+    return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
+        arr.slice(i * size, i * size + size)
+    )
+}
 
 const express = require('express');
 const router = express.Router();
