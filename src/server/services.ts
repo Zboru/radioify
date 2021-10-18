@@ -1,24 +1,18 @@
-import dayjs, {Dayjs} from "dayjs";
 import axios from "axios";
-import {PlaylistResponse} from "../types";
+import {PlaylistResponse, RadioListResponse} from "../client/types";
 
-const PLAYLIST_URL = "https://ods.lynx.re/playlist.php";
+const dayjs = require('dayjs');
+import {chunk, range} from "./utils";
+import {getRadiostationTracks} from "./types";
 
-
-function range(start: number, end: number) {
-    return (new Array(end - start + 1)).fill(undefined).map((_, i) => i + start);
+export async function getRadiostationList() {
+    const RADIOLIST_URL = "https://ods.lynx.re/radiolst.php";
+    const response = await axios.get<RadioListResponse>(RADIOLIST_URL);
+    return response.data.summary.flatMap(group => group.stations)
 }
 
-
-function chunk(arr: any[], size: number) {
-    return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
-        arr.slice(i * size, i * size + size)
-    )
-}
-
-export let currentProgress = 0;
-
-export async function getSongsFromDay(radioID: number, currentDate: Dayjs, startHour: number, endHour: number) {
+async function getSongsFromDay(radioID: number, currentDate: string, startHour: number, endHour: number) {
+    const PLAYLIST_URL = "https://ods.lynx.re/playlist.php";
     // The API allows you to download a maximum range of 10 hours,
     // so you need to split user range into chunks
     const hoursRange = range(startHour, endHour);
@@ -36,20 +30,17 @@ export async function getSongsFromDay(radioID: number, currentDate: Dayjs, start
         const {data} = await axios.get<PlaylistResponse>(`${PLAYLIST_URL}?r=${radioID}&date=${formattedDate}&time_from=${hours[0]}&time_to=${hours[1]}`);
         data.summary.forEach(song => songs.add(song.title))
     }
-    currentProgress += 1;
     return Array.from(songs);
 }
 
-// Get song list from day span
-export async function getSongsFromDateSpan(radioID: number, sD: string, eD: string, startHour: number, endHour: number) {
-    currentProgress = 0;
-    const endDate = dayjs(eD);
-    const startDate = dayjs(sD);
-    const totalDays: number = Math.abs(endDate.diff(startDate, 'days'));
+export async function getRadiostationTracks({radioID, startDate, endDate, startHour, endHour}: getRadiostationTracks) {
+    const startDateObj = dayjs(startDate);
+    const endDateObj = dayjs(endDate);
+    const totalDays = Math.abs(endDateObj.diff(startDateObj, 'days'));
 
     const promises = [];
     for (let i = 1; i <= totalDays; i++) {
-        const currentDate = startDate.add(i, 'day');
+        const currentDate = startDateObj.add(i, 'day');
         promises.push(getSongsFromDay(radioID, currentDate, startHour, endHour));
     }
 
@@ -69,3 +60,4 @@ export async function getSongsFromDateSpan(radioID: number, sD: string, eD: stri
         return {title: song, excluded: false}
     })
 }
+

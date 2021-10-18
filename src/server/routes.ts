@@ -1,17 +1,10 @@
 import {Request, Response} from "express";
-
 const SpotifyWebApi = require('spotify-web-api-node');
 import {AuthorizationCodeResponse, SpotifyTrack} from "./types";
-import {RadioListResponse, SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
-import axios from "axios";
-import {getSongsFromDateSpan} from "../client/utils/radio";
-import dayjs = require("dayjs");
+import {SpotifyPlaylistItem, SpotifyProfile} from "../client/types";
+import {getRadiostationList, getRadiostationTracks} from "./services";
+import {chunk} from "./utils";
 
-function chunk(arr: any[], size: number) {
-    return Array.from({length: Math.ceil(arr.length / size)}, (v, i) =>
-        arr.slice(i * size, i * size + size)
-    )
-}
 
 const express = require('express');
 const router = express.Router();
@@ -23,17 +16,26 @@ const spotifyApi = new SpotifyWebApi({
 });
 
 router.get('/api/radiolist', async (req: Request, res: Response) => {
-    const RADIOLIST_URL = "https://ods.lynx.re/radiolst.php";
-    axios.get<RadioListResponse>(RADIOLIST_URL).then((response) => {
-        const radioList = response.data.summary.flatMap(group => group.stations)
-        res.send(radioList);
-    })
+    const data = await getRadiostationList();
+    res.send(data);
 });
 
 router.get('/api/getRadioTracks', async (req: Request, res: Response) => {
-    const {radioID, startDate, endDate, startHour, endHour} = req.params
-    const data = await getSongsFromDateSpan(parseInt(radioID), startDate, endDate, parseInt(startHour), parseInt(endHour));
-    res.send(data);
+    const {radioID, startDate, endDate, startHour, endHour} = req.query
+    if (typeof radioID === "string" &&
+        typeof startDate === "string" &&
+        typeof endDate === "string" &&
+        typeof startHour === "string" &&
+        typeof endHour === "string") {
+        const data = await getRadiostationTracks({
+            radioID: parseInt(radioID),
+            startDate,
+            endDate,
+            startHour: parseInt(startHour),
+            endHour: parseInt(endHour)
+        });
+        res.send(data);
+    }
 });
 
 router.get('/api/login', async (req: Request, res: Response) => {

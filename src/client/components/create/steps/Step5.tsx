@@ -108,7 +108,7 @@ const Step5 = (props: {
                 istniejącej playlisty, duplikaty zostaną usunięte przed ich dodaniem.</p>
             <TextField onChange={handleNewPlaylist} className="my-2 md:w-1/2" placeholder={"Super playlista"}
                        label={"Nazwa playlisty"}/>
-            <RButton disabled={newPlaylistName.length > 0} onClick={addNewPlaylist} className="mb-4">Utwórz</RButton>
+            <RButton disabled={newPlaylistName.length === 0} onClick={addNewPlaylist} className="mb-4">Utwórz</RButton>
             <div
                 className={'overflow-auto h-56 transition-height rounded no-scrollbar shadow-md dark:border-gray-700 light:border-gray-300 w-100'}>
                 {spotifyPlaylists?.map((playlist, index) => {

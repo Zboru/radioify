@@ -1,8 +1,6 @@
 import React, {Dispatch, MouseEventHandler, useEffect, useState} from "react";
-import clsx from "clsx";
 import {TimeRange} from "../../../views/Create";
 import dayjs from "dayjs";
-import {currentProgress, getSongsFromDateSpan} from "../../../utils/radio";
 import {StationResponse} from "../../../types";
 import RButton from "../../general/RButton";
 import Card from "../Card";
@@ -23,12 +21,6 @@ const Step3 = (props: {
     setSongs: Dispatch<Song[]>,
 }) => {
     const [searching, setSearching] = useState(false);
-    const [searchProgress, setSearchProgress] = useState(0);
-    useEffect(() => {
-        setInterval(() => {
-            setSearchProgress(currentProgress)
-        }, 200);
-    }, []);
 
     function getTotalDays() {
         const startDate = dayjs(props.timeRange.startDate);
@@ -49,8 +41,8 @@ const Step3 = (props: {
         axios.get(import.meta.env.VITE_API_URL + "/api/getRadioTracks", {
             params: {
                 radioID: radioID,
-                startDate: startDate,
-                endDate: endDate,
+                startDate: startDate.format('YYYY-MM-DD'),
+                endDate: endDate.format('YYYY-MM-DD'),
                 startHour: props.timeRange.startHour,
                 endHour: props.timeRange.endHour
             }
@@ -69,7 +61,7 @@ const Step3 = (props: {
             {searching &&
             <p className="text-gray-500 italic flex items-center">
                 <span className="iconify animate-spin" data-icon="mdi:loading"/>
-                <span className="ml-2">Szukam... {searchProgress} / {getTotalDays()} dni</span>
+                <span className="ml-2">Szukam...</span>
             </p>
             }
             {!searching && props.songs && !!props.songs.length &&

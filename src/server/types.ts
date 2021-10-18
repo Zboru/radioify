@@ -21,3 +21,11 @@ export interface SpotifyTrack {
     name: string,
     uri: string,
 }
+
+export interface getRadiostationTracks {
+    radioID: number
+    startDate: string,
+    endDate: string,
+    startHour: number,
+    endHour: number,
+}
