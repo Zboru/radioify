@@ -19,7 +19,7 @@ This is a project that serves as a start for me to learn React and Typescript in
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Live
-_Coming soon_
+[Live](https://radioify.herokuapp.com/)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
