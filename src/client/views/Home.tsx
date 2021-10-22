@@ -1,54 +1,51 @@
 import React, {useEffect, useState} from 'react'
 import {useHistory, useLocation} from "react-router-dom";
-import axios from "axios";
 import {Link} from "react-router-dom";
-import {SpotifyProfile} from "../types";
-import {useLocalStorage} from "../hooks/useLocalStorage";
+import {useSessionStorage} from "../hooks/useSessionStorage";
 import clsx from "clsx";
 import RButton from "../components/general/RButton";
+import {createAuthorizationURL, getMe} from "../utils/spotify";
 
 const Home = () => {
     let history = useHistory();
     const location = useLocation<Location>();
     const [dataLoading, setLoading] = useState(false);
-    const [spotifyProfile, setProfile] = useLocalStorage('spoitfyProfile',null);
-    const [spotifyTokens, setTokens] = useLocalStorage('spotify', null)
+    const [spotifyProfile, setProfile] = useSessionStorage('spoitfyProfile', null);
+    const [spotifyToken, setToken] = useSessionStorage('spotifyToken', null)
 
     function loadProfile() {
-        if (spotifyTokens && spotifyProfile === null) {
-            setLoading(true)
-            axios.get<SpotifyProfile>(import.meta.env.VITE_API_URL + "/api/getProfile", {
-                params: {
-                    accessToken: spotifyTokens?.access_token,
-                    refreshToken: spotifyTokens?.refresh_token
-                }
-            }).then(response => {
-                setProfile(response.data);
+        if (spotifyToken && spotifyProfile === null) {
+            setLoading(true);
+            getMe(spotifyToken.token).then(response => {
+                setProfile(response);
                 setTimeout(() => {
                     setLoading(false)
-                }, 1000)
+                }, 500);
             })
         }
     }
 
-    useEffect(()=>{
-        const authCode = location?.search.replaceAll(/(\?code=)|(&state.+)/g, "");
-        if (authCode) {
-            axios.post(import.meta.env.VITE_API_URL + "/api/authorize", {code: authCode}).then((response) => {
-                setTokens(response.data);
-                history.push('/')
-            })
+    useEffect(() => {
+        // Remove hash from response
+        const locationString = location?.hash.replaceAll("#", "");
+        const authObject = Object.fromEntries(new URLSearchParams(locationString));
+        // Save access token with expiration date
+        if (authObject.access_token) {
+            const date = new Date()
+            setToken({
+                token: authObject.access_token,
+                expires_in: date.setHours(date.getHours() + 1)
+            });
+            history.push('/')
         }
-    },[])
+    }, [])
 
     useEffect(() => {
         loadProfile();
-    }, [spotifyTokens])
+    }, [spotifyToken])
 
     function spotifyLogin() {
-        axios.get(import.meta.env.VITE_API_URL + '/api/login').then(response => {
-            window.location = response.data;
-        })
+        window.location.href = createAuthorizationURL();
     }
 
     function spotifyProfileExists() {
@@ -86,7 +83,7 @@ const Home = () => {
                 'visible': !dataLoading
             })}>
                 <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfile?.image} alt=""/>
-                <span>Zalogowany jako {spotifyProfile?.name}</span>
+                <span>Zalogowany jako {spotifyProfile?.display_name}</span>
             </div>
             }
             {spotifyProfileExists() &&
