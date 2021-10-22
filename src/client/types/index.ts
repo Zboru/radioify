@@ -79,3 +79,13 @@ export interface PlaylistResponse {
     timeFrom: string,
     summary: PlaylistItem[]
 }
+
+// App types
+
+export interface getRadiostationTracks {
+    radioID: number
+    startDate: string,
+    endDate: string,
+    startHour: number,
+    endHour: number,
+}

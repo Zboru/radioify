@@ -4,7 +4,8 @@ import dayjs from "dayjs";
 import {StationResponse} from "../../../types";
 import RButton from "../../general/RButton";
 import Card from "../Card";
-import axios from "axios";
+import {currentProgress} from "../../../utils/radio";
+import {getRadiostationTracks} from "../../../utils/radio";
 
 export interface Song {
     title: string,
@@ -21,6 +22,13 @@ const Step3 = (props: {
     setSongs: Dispatch<Song[]>,
 }) => {
     const [searching, setSearching] = useState(false);
+    const [searchProgress, setSearchProgress] = useState(0);
+    
+    useEffect(()=>{
+        setInterval(()=>{
+            setSearchProgress(currentProgress)
+        }, 200);
+    }, []);
 
     function getTotalDays() {
         const startDate = dayjs(props.timeRange.startDate);
@@ -35,19 +43,17 @@ const Step3 = (props: {
 
     function startSearch() {
         setSearching(true);
-        const startDate = dayjs(props.timeRange.startDate);
-        const endDate = dayjs(props.timeRange.endDate);
+        const startDate = dayjs(props.timeRange.startDate).format('YYYY-MM-DD');
+        const endDate = dayjs(props.timeRange.endDate).format('YYYY-MM-DD');
         const radioID = props.selectedRadio?.id ?? 1;
-        axios.get(import.meta.env.VITE_API_URL + "/api/getRadioTracks", {
-            params: {
-                radioID: radioID,
-                startDate: startDate.format('YYYY-MM-DD'),
-                endDate: endDate.format('YYYY-MM-DD'),
-                startHour: props.timeRange.startHour,
-                endHour: props.timeRange.endHour
-            }
+        getRadiostationTracks({
+            radioID,
+            startDate,
+            endDate,
+            startHour: props.timeRange.startHour,
+            endHour: props.timeRange.endHour
         }).then(response => {
-            props.setSongs(response.data);
+            props.setSongs(response);
             setSearching(false);
         })
     }
@@ -61,7 +67,7 @@ const Step3 = (props: {
             {searching &&
             <p className="text-gray-500 italic flex items-center">
                 <span className="iconify animate-spin" data-icon="mdi:loading"/>
-                <span className="ml-2">Szukam...</span>
+                <span className="ml-2">Szukam... {searchProgress} / {getTotalDays()} dni</span>
             </p>
             }
             {!searching && props.songs && !!props.songs.length &&
