@@ -3,7 +3,7 @@ import {spotifySongs} from "./Step4";
 import Card from "../Card";
 import clsx from "clsx";
 import axios from "axios";
-import {useLocalStorage} from "../../../hooks/useLocalStorage";
+import {useSessionStorage} from "../../../hooks/useSessionStorage";
 import RButton from "../../general/RButton";
 import {SpotifyPlaylistItem, SpotifyPlaylistResponse} from "../../../types";
 import TextField from "../../general/TextField";
@@ -16,7 +16,7 @@ const Step5 = (props: {
     spotifySongs: spotifySongs | null,
     songList: any,
 }) => {
-    const [spotifyTokens, setTokens] = useLocalStorage('spotify', null);
+    const [spotifyTokens, setTokens] = useSessionStorage('spotify', null);
     const [selectedPlaylist, setSelectedPlaylist] = useState({});
     const [listState, toggleList] = useState(false);
     const [spotifyPlaylists, setPlaylists] = useState<SpotifyPlaylistItem[] | null>(null);

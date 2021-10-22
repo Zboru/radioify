@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react"
 import clsx from "clsx";
-import {useLocalStorage} from "../../hooks/useLocalStorage";
+import {useSessionStorage} from "../../hooks/useSessionStorage";
 
 const switchContainerClasses = ["w-14 h-7 flex transition items-center rounded-full mx-3 px-1"]
 const switchBallClasses = ["bg-white w-5 h-5 rounded-full transition shadow-md transform"];
 
 const DarkModeSwitch = () => {
-    const [darkMode, setMode] = useLocalStorage('darkMode', false);
+    const [darkMode, setMode] = useSessionStorage('darkMode', false);
 
     const toggleMode = () => {
         setChecked(!checked);

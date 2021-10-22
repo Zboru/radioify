@@ -12,7 +12,7 @@ import {Song} from "./Step3";
 import TextField from "../../general/TextField";
 import Fuse from "fuse.js";
 import axios from "axios";
-import {useLocalStorage} from "../../../hooks/useLocalStorage";
+import {useSessionStorage} from "../../../hooks/useSessionStorage";
 import {SpotifyTrack} from "../../../types";
 import RButton from "../../general/RButton";
 import Card from "../Card";
@@ -38,7 +38,7 @@ const Step4 = (props: {
 }) => {
     const [searching, setSearching] = useState(false);
     const [songFilter, setSongFilter] = useState<string | null>(null)
-    const [spotifyTokens, setTokens] = useLocalStorage('spotify', null);
+    const [spotifyTokens, setTokens] = useSessionStorage('spotify', null);
     const songListContainer = createRef<HTMLDivElement>();
 
     function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {

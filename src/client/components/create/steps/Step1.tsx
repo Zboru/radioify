@@ -3,7 +3,7 @@ import axios from "axios";
 import RAutocomplete from "../../general/RAutocomplete";
 import RButton from "../../general/RButton";
 import Card from "../Card";
-import {useLocalStorage} from "../../../hooks/useLocalStorage";
+import {useSessionStorage} from "../../../hooks/useSessionStorage";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
@@ -11,7 +11,7 @@ const Step1 = (props: ({
     selectRadio: any,
     selectedRadio: any,
 })) => {
-    const [radioList, setRadiolist] = useLocalStorage('radioList', [])
+    const [radioList, setRadiolist] = useSessionStorage('radioList', [])
 
     useEffect(() => {
         if (!radioList?.length) {
