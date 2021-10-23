@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "tsc-watch ./src/server/index.ts --onSuccess \"node ./src/server/index.js\"",
-    "start": "ts-node src/server/index.ts",
     "dev": "vite --host",
     "watch": "vite build --watch",
     "build": "tsc && vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "author": "Zboru",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "dayjs": "^1.10.7",
     "dotenv": "^10.0.0",
     "fuse.js": "^6.4.6",
+    "gh-pages": "^3.2.3",
     "morgan": "^1.10.0",
     "react": "^17.0.2",
     "react-day-picker": "^7.4.10",
