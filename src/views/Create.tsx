@@ -24,7 +24,7 @@ export interface onDayChange extends Array<Date | object> {
 }
 
 const Create = () => {
-    const [selectedRadio, selectRadio] = useState<StationResponse | null>(null);
+    const [selectedRadio, selectRadio] = useState<{label: string, value: number} | null>(null);
     const [songs, setSongs] = useState<Song[]>([]);
     const [spotifySongs, setSpotifySongs] = useState<spotifySongs | null>(null);
     const [currentStep, setStep] = useState(0);

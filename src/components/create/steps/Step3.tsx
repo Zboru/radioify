@@ -17,7 +17,7 @@ const Step3 = (props: {
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
     active: boolean,
-    selectedRadio: {label: string, value: number},
+    selectedRadio: {label: string, value: number} | null,
     songs: Song[],
     setSongs: Dispatch<Song[]>,
 }) => {
