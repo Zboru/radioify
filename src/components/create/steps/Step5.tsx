@@ -36,7 +36,6 @@ const Step5 = (props: {
                 if (props.onForward) {
                     props.onForward(e)
                 }
-                console.log(response)
             })
     }
 

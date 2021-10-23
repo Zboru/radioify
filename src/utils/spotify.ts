@@ -95,7 +95,6 @@ export async function addToPlaylist(access_token: string, playlist: any, songs: 
     }), 100)
     const removePromises = [];
     for (let index in removeTracksURIs) {
-        console.log(playlist.id, removeTracksURIs[index])
         removePromises.push(spotifyApi.playlists.removePlaylistItems(playlist.id, removeTracksURIs[index]))
     }
     await Promise.allSettled(removePromises)
