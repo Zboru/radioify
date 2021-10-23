@@ -2,12 +2,12 @@ import React, {ChangeEvent, createRef, MouseEventHandler, useEffect, useState} f
 import {spotifySongs} from "./Step4";
 import Card from "../Card";
 import clsx from "clsx";
-import axios from "axios";
 import {useSessionStorage} from "../../../hooks/useSessionStorage";
 import RButton from "../../general/RButton";
-import {SpotifyPlaylistItem, SpotifyPlaylistResponse} from "../../../types";
+import {SpotifyPlaylistItem} from "../../../types";
 import TextField from "../../general/TextField";
 import {Song} from "./Step3";
+import {addToPlaylist, createNewPlaylist, getPlaylists} from "../../../utils/spotify";
 
 const Step5 = (props: {
     onForward?: MouseEventHandler,
@@ -16,7 +16,7 @@ const Step5 = (props: {
     spotifySongs: spotifySongs | null,
     songList: any,
 }) => {
-    const [spotifyTokens, setTokens] = useSessionStorage('spotify', null);
+    const [spotifyToken, setTokens] = useSessionStorage('spotifyToken', null);
     const [selectedPlaylist, setSelectedPlaylist] = useState({});
     const [listState, toggleList] = useState(false);
     const [spotifyPlaylists, setPlaylists] = useState<SpotifyPlaylistItem[] | null>(null);
@@ -27,31 +27,24 @@ const Step5 = (props: {
         return props.spotifySongs?.notFoundSongs || []
     }
 
-    function handlePlaylist(e: React.MouseEvent) {
-        axios.post(import.meta.env.VITE_API_URL + "/api/addToPlaylist", {
-            refreshToken: spotifyTokens.refresh_token,
-            playlist: selectedPlaylist,
-            songs: props.spotifySongs?.tracks.map(track => {
-                return {uri: track.uri}
+    function syncPlaylist(e: React.MouseEvent) {
+        const songsURIs = props.spotifySongs?.tracks.map(track => {
+            return {uri: track.uri}
+        }) ?? [];
+        addToPlaylist(spotifyToken.token, selectedPlaylist, songsURIs)
+            .then(response => {
+                if (props.onForward) {
+                    props.onForward(e)
+                }
+                console.log(response)
             })
-        }).then(response => {
-            if (props.onForward) {
-                props.onForward(e)
-            }
-            console.log(response)
-        })
     }
 
     function addNewPlaylist() {
-        axios.post(import.meta.env.VITE_API_URL + '/api/addNewPlaylist', {
-            refreshToken: spotifyTokens.refresh_token,
-            name: newPlaylistName
-        }).then((response: any) => {
-            const newPlaylist = response.data.body;
+        createNewPlaylist(spotifyToken.token, newPlaylistName).then(response => {
             if (spotifyPlaylists !== null) {
-                setPlaylists([newPlaylist, ...spotifyPlaylists])
+                setPlaylists([response, ...spotifyPlaylists])
             }
-            console.log(newPlaylist);
         })
     }
 
@@ -60,8 +53,8 @@ const Step5 = (props: {
     }
 
     function getUserPlaylists() {
-        axios.get<SpotifyPlaylistResponse>(import.meta.env.VITE_API_URL + "/api/getPlaylists", {params: {refreshToken: spotifyTokens?.refresh_token}}).then(response => {
-            const userPlaylists = response.data.body.items.filter(playlist => {
+        getPlaylists(spotifyToken.token).then(response => {
+            const userPlaylists = response.items.filter((playlist: { owner: { uri: string; }; }) => {
                 return playlist.owner.uri === 'spotify:user:bonk-pl'
             })
             setPlaylists(userPlaylists);
@@ -93,7 +86,7 @@ const Step5 = (props: {
                 })}
                 {!notFoundSongs().length &&
                 <div className="flex justify-center flex-col items-center h-full">
-                    <span className="iconify text-4xl" data-icon="fluent:missing-metadata-16-regular" />
+                    <span className="iconify text-4xl" data-icon="fluent:missing-metadata-16-regular"/>
                     <span>Lista jest pusta</span>
                 </div>
                 }
@@ -130,7 +123,7 @@ const Step5 = (props: {
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
                 >Wstecz
                 </button>
-                <button onClick={handlePlaylist} type="button"
+                <button onClick={syncPlaylist} type="button"
                         className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3"
                 >Dodaj!
                 </button>

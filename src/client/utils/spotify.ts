@@ -1,6 +1,8 @@
 import {SpotifyWebApi} from 'spotify-web-api-ts';
-import {SpotifyTrack} from "../../server/types";
+import {SpotifyTrack} from "../types";
 import {Song} from "../components/create/steps/Step3";
+import {chunk} from "./helpers";
+import {SpotifyPlaylistItem} from "../types";
 
 const spotifyApi = new SpotifyWebApi();
 
@@ -31,7 +33,6 @@ export async function getMe(access_token: string) {
     spotifyApi.setAccessToken(access_token);
     return await spotifyApi.users.getMe()
 }
-
 
 async function findSpotifyTrack(song: string) {
     const songDetails = song.split(' - ');
@@ -74,7 +75,7 @@ export async function fetchTracks(access_token: string, songs: Song[]) {
 
 export async function getPlaylists(access_token: string) {
     spotifyApi.setAccessToken(access_token);
-    spotifyApi.playlists.getMyPlaylists({'limit': 50}).then((response: any) => {
+    return await spotifyApi.playlists.getMyPlaylists({'limit': 50}).then((response: any) => {
         return response
     })
 }
@@ -82,7 +83,30 @@ export async function getPlaylists(access_token: string) {
 export async function createNewPlaylist(access_token: string, playlistName: string) {
     spotifyApi.setAccessToken(access_token);
     const currentUser = await spotifyApi.users.getMe();
-    spotifyApi.playlists.createPlaylist(currentUser.id, playlistName).then(response => {
+    return await spotifyApi.playlists.createPlaylist(currentUser.id, playlistName).then(response => {
         return response
     })
+}
+
+export async function addToPlaylist(access_token: string, playlist: any, songs: { uri: string }[]) {
+    // Delete all duplicates from playlist
+    const removeTracksURIs = chunk(songs.map((track) => {
+        return track.uri
+    }), 100)
+    const removePromises = [];
+    for (let index in removeTracksURIs) {
+        console.log(playlist.id, removeTracksURIs[index])
+        removePromises.push(spotifyApi.playlists.removePlaylistItems(playlist.id, removeTracksURIs[index]))
+    }
+    await Promise.allSettled(removePromises)
+
+    // Add new tracks to playlist
+    const newTracksURIs = chunk(songs.map((track) => {
+        return track.uri
+    }), 100)
+    const newTrackPromises = [];
+    for (let index in newTracksURIs) {
+        newTrackPromises.push(spotifyApi.playlists.addItemsToPlaylist(playlist.id, newTracksURIs[index]));
+    }
+    await Promise.allSettled(newTrackPromises)
 }
