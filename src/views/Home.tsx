@@ -52,6 +52,12 @@ const Home = () => {
         return spotifyProfile !== null
     }
 
+    function spotifyProfileImage() {
+        if (spotifyProfileExists()) {
+            return spotifyProfile.images[0].url ?? "https://api.iconify.design/ph:user.svg";
+        }
+    }
+
     return (
         <div className="p-5">
             <div className="mb-2">
@@ -82,7 +88,7 @@ const Home = () => {
                 'hidden': dataLoading,
                 'visible': !dataLoading
             })}>
-                <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfile?.image} alt=""/>
+                <img className={"w-10 h-10 rounded-full mr-2"} src={spotifyProfileImage()} alt=""/>
                 <span>Zalogowany jako {spotifyProfile?.display_name}</span>
             </div>
             }
