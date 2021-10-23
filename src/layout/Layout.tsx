@@ -2,6 +2,7 @@ import React from "react"
 import { Link } from 'react-router-dom'
 import DarkModeSwitch from "../components/navigation/DarkModeSwitch";
 import GithubLink from "../components/navigation/GithubLink";
+import LanguageSwitch from "../components/navigation/LanguageSwitch";
 
 const Layout = (props: { children: React.ReactNode }): JSX.Element => {
     return (
@@ -12,6 +13,7 @@ const Layout = (props: { children: React.ReactNode }): JSX.Element => {
                     <Link to="/">Radioify dla Spotify</Link>
                     <div className="flex">
                         <GithubLink/>
+                        <LanguageSwitch/>
                         <DarkModeSwitch/>
                     </div>
                 </div>
