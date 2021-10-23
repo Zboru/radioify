@@ -17,13 +17,13 @@ const Step3 = (props: {
     onForward?: MouseEventHandler,
     onBackward?: MouseEventHandler,
     active: boolean,
-    selectedRadio: StationResponse | null,
+    selectedRadio: {label: string, value: number},
     songs: Song[],
     setSongs: Dispatch<Song[]>,
 }) => {
     const [searching, setSearching] = useState(false);
     const [searchProgress, setSearchProgress] = useState(0);
-    
+
     useEffect(()=>{
         setInterval(()=>{
             setSearchProgress(currentProgress)
@@ -45,7 +45,7 @@ const Step3 = (props: {
         setSearching(true);
         const startDate = dayjs(props.timeRange.startDate).format('YYYY-MM-DD');
         const endDate = dayjs(props.timeRange.endDate).format('YYYY-MM-DD');
-        const radioID = props.selectedRadio?.id ?? 1;
+        const radioID = props.selectedRadio?.value ?? 1;
         getRadiostationTracks({
             radioID,
             startDate,

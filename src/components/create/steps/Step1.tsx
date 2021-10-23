@@ -1,9 +1,9 @@
 import React, {MouseEventHandler, useEffect} from "react";
-import RAutocomplete from "../../general/RAutocomplete";
 import RButton from "../../general/RButton";
 import Card from "../Card";
 import {useSessionStorage} from "../../../hooks/useSessionStorage";
 import {getRadiostationList} from "../../../utils/radio";
+import Select from "react-select";
 
 const Step1 = (props: ({
     onForward?: MouseEventHandler,
@@ -11,12 +11,15 @@ const Step1 = (props: ({
     selectRadio: any,
     selectedRadio: any,
 })) => {
-    const [radioList, setRadiolist] = useSessionStorage('radioList', [])
+    const [radioList, setRadiolist] = useSessionStorage('radioList', [{value: '231223', label: '2132132'}])
 
     useEffect(() => {
         if (!radioList?.length) {
             getRadiostationList().then(response => {
-                setRadiolist(response);
+                const radioMap = response.map(station => {
+                    return {label: station.name, value: station.id}
+                })
+                setRadiolist(radioMap);
             })
         }
     }, [])
@@ -26,14 +29,10 @@ const Step1 = (props: ({
             <p>Skorzystaj z wyszukiwarki, aby wybrać radio, z którego mają być pobrane piosenki. Lista stacji radiowych
                 jest dostarczana przez
                 serwis&nbsp;<a className="underline" href="https://odsluchane.eu" target="_blank">odSluchane.eu</a>.</p>
-            <RAutocomplete
-                searchBy="name"
-                display="name"
-                items={radioList}
-                label={'Wyszukaj radio'}
-                onSelect={props.selectRadio}
-                placeholder={'Antyradio'}
-            />
+            <label htmlFor="radioSelect">
+                <span className="text-sm select-none text-gray-600 dark:text-gray-200">Wyszukaj radio</span>
+                <Select options={radioList} onChange={props.selectRadio} inputId='radioSelect' placeholder={"Eska"}/>
+            </label>
             <div className="flex">
                 <div className="flex-grow"/>
                 <RButton disabled={!props.selectedRadio} className="mt-2" onClick={props.onForward}>Dalej</RButton>
