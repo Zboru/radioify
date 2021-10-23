@@ -1,4 +1,4 @@
-import SpotifyWebApi from "spotify-web-api-js";
+import {SpotifyWebApi} from 'spotify-web-api-ts';
 import {SpotifyTrack} from "../../server/types";
 import {Song} from "../components/create/steps/Step3";
 
@@ -29,7 +29,7 @@ export function createAuthorizationURL() {
 
 export async function getMe(access_token: string) {
     spotifyApi.setAccessToken(access_token);
-    return spotifyApi.getMe();
+    return await spotifyApi.users.getMe()
 }
 
 
@@ -45,9 +45,9 @@ async function findSpotifyTrack(song: string) {
     }
     for await (let artist of artists) {
         artist = artist.split("\'").join("");
-        const searchQuery = await spotifyApi.searchTracks(`track:${title} artist:${artist}`);
-        if (searchQuery?.tracks.items.length) {
-            const tracks = searchQuery.tracks.items;
+        const foundTracks = await spotifyApi.search.searchTracks(`track:${title} artist:${artist}`);
+        if (foundTracks?.items.length) {
+            const tracks = foundTracks.items;
             return tracks[0];
         }
     }
@@ -71,4 +71,18 @@ export async function fetchTracks(access_token: string, songs: Song[]) {
     }
     return {tracks, notFoundSongs};
 }
+
+export async function getPlaylists(access_token: string) {
+    spotifyApi.setAccessToken(access_token);
+    spotifyApi.playlists.getMyPlaylists({'limit': 50}).then((response: any) => {
+        return response
+    })
+}
+
+export async function createNewPlaylist(access_token: string, playlistName: string) {
+    spotifyApi.setAccessToken(access_token);
+    const currentUser = await spotifyApi.users.getMe();
+    spotifyApi.playlists.createPlaylist(currentUser.id, playlistName).then(response => {
+        return response
+    })
 }
