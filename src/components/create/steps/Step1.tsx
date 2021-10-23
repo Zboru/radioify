@@ -11,7 +11,7 @@ const Step1 = (props: ({
     selectRadio: any,
     selectedRadio: any,
 })) => {
-    const [radioList, setRadiolist] = useSessionStorage('radioList', [{value: '231223', label: '2132132'}])
+    const [radioList, setRadiolist] = useSessionStorage('radioList', [])
 
     useEffect(() => {
         if (!radioList?.length) {
