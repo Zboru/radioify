@@ -1,4 +1,6 @@
 import SpotifyWebApi from "spotify-web-api-js";
+import {SpotifyTrack} from "../../server/types";
+import {Song} from "../components/create/steps/Step3";
 
 const spotifyApi = new SpotifyWebApi();
 
@@ -27,5 +29,46 @@ export function createAuthorizationURL() {
 
 export async function getMe(access_token: string) {
     spotifyApi.setAccessToken(access_token);
-    return await spotifyApi.getMe();
+    return spotifyApi.getMe();
+}
+
+
+async function findSpotifyTrack(song: string) {
+    const songDetails = song.split(' - ');
+    // Remove obsolete strings from artist and track name
+    const artists = songDetails[0].trim().split(/[&;\/(feat.)]/)
+    let title;
+    if (songDetails[1]) {
+        title = songDetails[1].trim().split(/(feat)|(ft)|(prod)|[(]/gi)[0].split("\'").join("");
+    } else {
+        title = "";
+    }
+    for await (let artist of artists) {
+        artist = artist.split("\'").join("");
+        const searchQuery = await spotifyApi.searchTracks(`track:${title} artist:${artist}`);
+        if (searchQuery?.tracks.items.length) {
+            const tracks = searchQuery.tracks.items;
+            return tracks[0];
+        }
+    }
+}
+
+export let fetchProgress = 0;
+
+export async function fetchTracks(access_token: string, songs: Song[]) {
+    spotifyApi.setAccessToken(access_token);
+    fetchProgress = 0;
+    const notFoundSongs = [];
+    const tracks = [];
+    for await (let song of songs) {
+        const track: SpotifyTrack | undefined = await findSpotifyTrack(song.title);
+        if (track === undefined) {
+            notFoundSongs.push(song);
+        } else {
+            tracks.push(track);
+        }
+        fetchProgress += 1;
+    }
+    return {tracks, notFoundSongs};
+}
 }

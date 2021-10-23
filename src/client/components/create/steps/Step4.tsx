@@ -1,21 +1,18 @@
 import React, {
     ChangeEvent,
-    ChangeEventHandler,
     createRef,
     Dispatch,
-    MouseEventHandler,
-    useEffect,
+    MouseEventHandler, useEffect,
     useState
 } from "react";
-import clsx from "clsx";
 import {Song} from "./Step3";
 import TextField from "../../general/TextField";
 import Fuse from "fuse.js";
-import axios from "axios";
 import {useSessionStorage} from "../../../hooks/useSessionStorage";
 import {SpotifyTrack} from "../../../types";
 import RButton from "../../general/RButton";
 import Card from "../Card";
+import {fetchProgress, fetchTracks} from "../../../utils/spotify";
 
 export interface notFoundSong {
     title: string,
@@ -38,8 +35,15 @@ const Step4 = (props: {
 }) => {
     const [searching, setSearching] = useState(false);
     const [songFilter, setSongFilter] = useState<string | null>(null)
-    const [spotifyTokens, setTokens] = useSessionStorage('spotify', null);
+    const [spotifyToken, setTokens] = useSessionStorage('spotifyToken', null);
     const songListContainer = createRef<HTMLDivElement>();
+    const [searchProgress, setProgress] = useState(0);
+
+    useEffect(()=>{
+        setInterval(()=>{
+            setProgress(fetchProgress)
+        }, 200);
+    }, []);
 
     function handleFilterChange(event: ChangeEvent<HTMLInputElement>) {
         const value = event.currentTarget.value
@@ -77,12 +81,9 @@ const Step4 = (props: {
     function searchSongs() {
         setSearching(true)
         const notExcludedSongs = props.songs.filter(song => !song.excluded)
-        axios.post(import.meta.env.VITE_API_URL + '/api/searchSongs', {
-            tokens: spotifyTokens,
-            songs: notExcludedSongs
-        }).then(response => {
-            props.setSpotifySongs(response.data);
-            setSearching(false)
+        fetchTracks(spotifyToken.token, notExcludedSongs).then(response => {
+            props.setSpotifySongs(response);
+            setSearching(false);
         })
     }
 
@@ -112,7 +113,7 @@ const Step4 = (props: {
             {searching &&
             <p className="text-gray-500 italic flex items-center">
                 <span className="iconify animate-spin" data-icon="mdi:loading"/>
-                <span className="ml-2">Szukam...</span>
+                <span className="ml-2">Szukam... {searchProgress} / {props.songs.filter(song => !song.excluded).length}</span>
             </p>
             }
             {(!searching && props.spotifySongs?.tracks && props.spotifySongs.tracks.length) &&
