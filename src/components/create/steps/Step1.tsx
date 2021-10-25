@@ -16,7 +16,7 @@ const Step1 = (props: ({
     useEffect(() => {
         if (!radioList?.length) {
             getRadiostationList().then(response => {
-                const radioMap = response.map(station => {
+                const radioMap = response.map((station: { name: string; id: number; }) => {
                     return {label: station.name, value: station.id}
                 })
                 setRadiolist(radioMap);
