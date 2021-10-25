@@ -8,8 +8,9 @@ export let currentProgress = 0;
 
 export async function getRadiostationList() {
     const RADIOLIST_URL = "https://ods.lynx.re/radiolst.php";
-    const response = await axios.get<RadioListResponse>(RADIOLIST_URL);
-    return response.data.summary.flatMap(group => group.stations)
+    const fetchURL = `https://api.allorigins.win/get?url=${encodeURIComponent(RADIOLIST_URL)}`;
+    const response = await axios.get<RadioListResponse>(fetchURL).then(response => JSON.parse(response.data.contents));
+    return response.summary.flatMap(group => group.stations)
 }
 
 async function getSongsFromDay(radioID: number, currentDate: string, startHour: number, endHour: number) {
@@ -28,8 +29,9 @@ async function getSongsFromDay(radioID: number, currentDate: string, startHour: 
             hours[1] = 0;
         }
         const formattedDate = dayjs(currentDate).format('DD-MM-YYYY')
-        const {data} = await axios.get<PlaylistResponse>(`${PLAYLIST_URL}?r=${radioID}&date=${formattedDate}&time_from=${hours[0]}&time_to=${hours[1]}`);
-        data.summary.forEach(song => songs.add(song.title))
+        const fetchURL = `https://api.allorigins.win/get?url=${encodeURIComponent(`${PLAYLIST_URL}?r=${radioID}&date=${formattedDate}&time_from=${hours[0]}&time_to=${hours[1]}`)}`;
+        const response = await axios.get<PlaylistResponse>(fetchURL).then(response => JSON.parse(response.data.contents));
+        response.summary.forEach(song => songs.add(song.title))
     }
     currentProgress += 1;
     return Array.from(songs);
